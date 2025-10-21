@@ -1,69 +1,166 @@
----
 name: 🐛 Bug Report
-about: Report a bug or unexpected behavior
+description: Report a bug or unexpected behavior in EdBindings
 title: '[BUG] '
 labels: ['bug', 'needs-triage']
-assignees: ''
----
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report a bug! Please fill out the information below to help us resolve the issue.
 
-## 🐛 Bug Description
-**Describe the bug**
-A clear and concise description of what the bug is.
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: 🐛 Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: Describe the bug...
+    validations:
+      required: true
 
-## 🔄 Steps to Reproduce
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '...'
-3. Scroll down to '...'
-4. See error
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: 🔄 Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
 
-## ✅ Expected Behavior
-A clear and concise description of what you expected to happen.
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: ✅ Expected Behavior
+      description: A clear and concise description of what you expected to happen.
+      placeholder: What should have happened?
+    validations:
+      required: true
 
-## ❌ Actual Behavior
-A clear and concise description of what actually happened.
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: ❌ Actual Behavior  
+      description: A clear and concise description of what actually happened.
+      placeholder: What actually happened?
+    validations:
+      required: true
 
-## 📸 Screenshots
-If applicable, add screenshots to help explain your problem.
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 📸 Screenshots
+      description: If applicable, add screenshots to help explain your problem.
+      placeholder: Drag and drop screenshots here or click to upload
 
-## 🖥️ Environment Information
-**Application Version:**
-- EdBindings Version: [e.g. v1.2.3]
-- Installation Method: [MSI Installer / ZIP Archive / Built from source]
+  - type: input
+    id: app-version
+    attributes:
+      label: 📱 Application Version
+      description: What version of EdBindings are you running?
+      placeholder: e.g., v1.0.0
+    validations:
+      required: true
 
-**System Information:**
-- OS: [e.g. Windows 11 22H2]
-- .NET Runtime: [e.g. .NET 8.0]
-- Elite Dangerous Version: [e.g. Odyssey / Horizons]
+  - type: dropdown
+    id: installation-method
+    attributes:
+      label: 📦 Installation Method
+      description: How did you install EdBindings?
+      options:
+        - MSI Installer
+        - ZIP Archive
+        - Built from source
+    validations:
+      required: true
 
-**Hardware:**
-- Input Devices: [e.g. Thrustmaster T.16000M, Logitech X56, etc.]
-- Multiple Monitors: [Yes/No]
+  - type: input
+    id: operating-system
+    attributes:
+      label: 💻 Operating System
+      description: What OS are you using?
+      placeholder: e.g., Windows 11 22H2
+    validations:
+      required: true
 
-## 📄 Binding File Information
-**Elite Dangerous Binding File:**
-- Binding File Name: [e.g. Custom.4.0.binds]
-- Custom Bindings: [Yes/No]
-- Device Mapping Used: [e.g. X56, T.16000M, None]
+  - type: input
+    id: dotnet-runtime
+    attributes:
+      label: ⚡ .NET Runtime Version
+      description: What .NET runtime version is installed?
+      placeholder: e.g., .NET 8.0
 
-## 📋 Additional Context
-**Error Messages:**
-```
-Paste any error messages here
-```
+  - type: dropdown
+    id: ed-version
+    attributes:
+      label: 🚀 Elite Dangerous Version
+      description: Which version of Elite Dangerous are you using?
+      options:
+        - Odyssey
+        - Horizons
+        - Legacy
+        - Not sure
 
-**Log Files:**
-If available, please attach relevant log files or error details.
+  - type: textarea
+    id: hardware-info
+    attributes:
+      label: 🕹️ Hardware Information
+      description: List your input devices and hardware setup
+      placeholder: |
+        Input Devices: e.g., Thrustmaster T.16000M, Logitech X56
+        Multiple Monitors: Yes/No
+        Other relevant hardware...
 
-**Additional Information:**
-Add any other context about the problem here.
+  - type: input
+    id: binding-file
+    attributes:
+      label: 📄 Binding File Name
+      description: Name of the Elite Dangerous binding file you're using
+      placeholder: e.g., Custom.4.0.binds
 
-## 🔧 Attempted Solutions
-- [ ] Restarted the application
-- [ ] Tried different binding file
-- [ ] Checked device mapping settings
-- [ ] Reinstalled the application
-- [ ] Other: [Describe what you tried]
+  - type: dropdown
+    id: custom-bindings
+    attributes:
+      label: 🎮 Custom Bindings
+      description: Are you using custom key bindings?
+      options:
+        - "Yes"
+        - "No"
+        - "Not sure"
 
-## 📝 Additional Notes
-Any additional information that might be helpful in resolving this issue.
+  - type: input
+    id: device-mapping
+    attributes:
+      label: 🎛️ Device Mapping
+      description: Which device mapping are you using in EdBindings?
+      placeholder: e.g., X56, T.16000M, None
+
+  - type: textarea
+    id: error-messages
+    attributes:
+      label: 🚨 Error Messages
+      description: Paste any error messages or stack traces here
+      placeholder: Paste error messages here...
+      render: text
+
+  - type: textarea
+    id: attempted-solutions
+    attributes:
+      label: 🔧 Attempted Solutions
+      description: What have you already tried to fix this issue?
+      placeholder: |
+        - [ ] Restarted the application
+        - [ ] Tried different binding file  
+        - [ ] Checked device mapping settings
+        - [ ] Reinstalled the application
+        - [ ] Other: [Describe what you tried]
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 📝 Additional Context
+      description: Any other information that might be helpful
+      placeholder: Add any other context about the problem here...

@@ -1,84 +1,69 @@
----
 name: ✨ Feature Request
-about: Suggest a new feature or enhancement
+description: Suggest a new feature or enhancement for EdBindings
 title: '[FEATURE] '
 labels: ['enhancement', 'needs-triage']
-assignees: ''
----
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a new feature! Please provide detailed information to help us understand your request.
 
-## ✨ Feature Description
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+  - type: textarea
+    id: problem-description
+    attributes:
+      label: 🤔 Problem Description
+      description: Is your feature request related to a problem? Please describe the problem you're trying to solve.
+      placeholder: I'm always frustrated when...
+    validations:
+      required: true
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+  - type: textarea
+    id: solution-description
+    attributes:
+      label: ✨ Proposed Solution
+      description: Describe the solution you'd like to see implemented.
+      placeholder: A clear and concise description of what you want to happen...
+    validations:
+      required: true
 
-## 🎯 Use Case
-**Who would benefit from this feature?**
-- [ ] Elite Dangerous players using complex control setups
-- [ ] VoiceAttack users
-- [ ] Streamers/Content creators
-- [ ] Accessibility users
-- [ ] Other: [Describe]
+  - type: checkboxes
+    id: use-case
+    attributes:
+      label: 🎯 Who Would Benefit?
+      description: Select all user groups who would benefit from this feature
+      options:
+        - label: Elite Dangerous players using complex control setups
+        - label: VoiceAttack users
+        - label: Streamers/Content creators
+        - label: HOTAS/HOSAS users
+        - label: Accessibility users
+        - label: Multi-monitor setup users
+        - label: All EdBindings users
 
-**How would you use this feature?**
-Describe the specific scenario where this feature would be helpful.
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 📈 Priority Level
+      description: How important is this feature to you?
+      options:
+        - Low - Nice to have
+        - Medium - Would improve workflow
+        - High - Significantly impacts usability
+        - Critical - Blocking current usage
+    validations:
+      required: true
 
-## 💡 Proposed Implementation
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: � Alternative Solutions
+      description: Describe any alternative solutions or features you've considered.
+      placeholder: What alternatives have you considered?
 
-**UI/UX Suggestions**
-If this involves user interface changes, describe or sketch how it should look/work.
-
-## 📋 Requirements
-**Functional Requirements:**
-- [ ] Requirement 1
-- [ ] Requirement 2
-- [ ] Requirement 3
-
-**Technical Considerations:**
-- Elite Dangerous compatibility
-- Device support requirements
-- Performance impact
-- Configuration complexity
-
-## 🎨 Mockups/Examples
-**Visual Examples:**
-If applicable, add sketches, mockups, or examples from other applications.
-
-**Reference Applications:**
-Are there other tools that have similar functionality? How do they implement it?
-
-## 🔧 Elite Dangerous Integration
-**Binding File Support:**
-- [ ] Works with existing binding files
-- [ ] Requires binding file changes
-- [ ] Independent of binding files
-
-**Device Compatibility:**
-- [ ] All input devices
-- [ ] Specific device types: [List devices]
-- [ ] New device mapping required
-
-## 📊 Priority
-**How important is this feature to you?**
-- [ ] Critical - Blocks current workflow
-- [ ] High - Would significantly improve experience
-- [ ] Medium - Nice to have
-- [ ] Low - Minor improvement
-
-**Estimated Usage:**
-- [ ] Would use daily
-- [ ] Would use weekly
-- [ ] Would use occasionally
-- [ ] Would use rarely
-
-## 🔗 Related Issues
-**Are there related issues or feature requests?**
-- Relates to #[issue number]
-- Blocks #[issue number]
-- Depends on #[issue number]
-
-## 📝 Additional Context
-Add any other context, links, or information about the feature request here.
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 📝 Additional Context
+      description: Add any other context, screenshots, or examples about the feature request.
+      placeholder: Any additional information that would help understand this request...

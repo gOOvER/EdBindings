@@ -1,0 +1,52 @@
+name: 💬 Feedback & Suggestions
+description: Share your experience and suggestions for improvement
+title: '[FEEDBACK] '
+labels: ['feedback', 'needs-triage']
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to share your feedback! Your input helps us improve EdBindings.
+
+  - type: dropdown
+    id: feedback-type
+    attributes:
+      label: 💬 Feedback Type
+      description: What kind of feedback are you sharing?
+      options:
+        - General Experience
+        - User Interface/Design
+        - Performance
+        - Feature Suggestion
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: feedback-details
+    attributes:
+      label: 📝 Your Feedback
+      description: Please share your detailed feedback or suggestions.
+      placeholder: I think EdBindings could be improved by...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: experience-level
+    attributes:
+      label: 🎯 Experience Level
+      description: How would you describe your experience with EdBindings?
+      options:
+        - New user (first time using)
+        - Casual user (occasionally)
+        - Regular user (weekly)
+        - Power user (daily)
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 📋 Additional Context
+      description: Any other context or information you'd like to share?
+      placeholder: Additional thoughts, comparisons to other tools, etc.

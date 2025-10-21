@@ -1,60 +1,55 @@
----
 name: ❓ General Question
-about: Ask a question about EdBindings usage or configuration
+description: Ask a question about EdBindings usage or configuration
 title: '[QUESTION] '
 labels: ['question', 'needs-triage']
-assignees: ''
----
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have a question about EdBindings? We're here to help!
 
-## ❓ Question
-**What would you like to know?**
-A clear and concise description of your question.
+  - type: textarea
+    id: question
+    attributes:
+      label: ❓ Your Question
+      description: What would you like to know?
+      placeholder: Please ask your question here...
+    validations:
+      required: true
 
-## 🎮 Context
-**What are you trying to achieve?**
-Describe what you're trying to do with EdBindings and Elite Dangerous.
+  - type: dropdown
+    id: category
+    attributes:
+      label: 📂 Question Category
+      description: What type of question is this?
+      options:
+        - Usage/How-to
+        - Configuration
+        - Device Setup
+        - Elite Dangerous Integration
+        - Technical Issue
+        - Other
+    validations:
+      required: true
 
-**Current Setup:**
-- EdBindings Version: [e.g. v1.2.3]
-- Elite Dangerous Version: [e.g. Odyssey / Horizons]
-- Input Devices: [e.g. HOTAS, Gamepad, Keyboard+Mouse]
-- Device Mapping: [e.g. X56, Custom, None]
+  - type: textarea
+    id: context
+    attributes:
+      label: 🎯 Context
+      description: What are you trying to achieve? Provide some background.
+      placeholder: I'm trying to...
 
-## 🔍 What You've Tried
-**Research Done:**
-- [ ] Checked the README documentation
-- [ ] Searched existing issues
-- [ ] Looked at Elite Dangerous documentation
-- [ ] Asked in community forums
-- [ ] Tried different configurations
+  - type: textarea
+    id: attempted-solutions
+    attributes:
+      label: 🔍 What You've Tried
+      description: Have you tried anything to solve this yourself?
+      placeholder: I've already tried...
 
-**Specific Attempts:**
-Describe what you've already tried or looked into.
-
-## 📋 Related Information
-**Binding File Details:**
-- Using custom bindings: [Yes/No]
-- Specific binding categories: [e.g. Flight, SRV, On-foot]
-- Multiple binding sets: [Yes/No]
-
-**Screenshots:**
-If applicable, add screenshots of your current setup or configuration.
-
-## 🎯 Expected Outcome
-**What kind of answer are you looking for?**
-- [ ] Step-by-step instructions
-- [ ] Configuration examples
-- [ ] Troubleshooting help
-- [ ] General information
-- [ ] Best practices recommendations
-
-## 📚 Documentation
-**Would this question benefit from documentation?**
-If this is a common question, should it be added to documentation or FAQ?
-
-## 🔗 Related Resources
-**Relevant Links:**
-If you have links to related forum posts, videos, or documentation, include them here.
-
-## 📝 Additional Context
-Add any other context or information that might help answer your question.
+  - type: input
+    id: app-version
+    attributes:
+      label: 📱 EdBindings Version
+      description: Which version are you using?
+      placeholder: e.g., v1.0.0
