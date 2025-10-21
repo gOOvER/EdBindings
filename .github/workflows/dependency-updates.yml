@@ -286,16 +286,11 @@ jobs:
           }
           
           # Create detailed commit body
-          $commitBody = @"
-Automated dependency update
-
-Update type: ${{ github.event.inputs.update_type || 'minor' }}
-Summary: ${{ needs.check-dependencies.outputs.update-summary }}
-
-Security updates included: ${{ needs.check-dependencies.outputs.security-updates }}
-
-✅ Build and tests verified after updates
-"@
+          $commitBody = "Automated dependency update`n`n" +
+                       "Update type: ${{ github.event.inputs.update_type || 'minor' }}`n" +
+                       "Summary: ${{ needs.check-dependencies.outputs.update-summary }}`n`n" +
+                       "Security updates included: ${{ needs.check-dependencies.outputs.security-updates }}`n`n" +
+                       "✅ Build and tests verified after updates"
           
           Write-Host "commit-message=$commitMessage" >> $env:GITHUB_OUTPUT
           Write-Host "commit-body<<EOF" >> $env:GITHUB_OUTPUT
