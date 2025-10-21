@@ -1,0 +1,30 @@
+[files]
+extend-exclude = [
+    "*.json",
+    "*.xml", 
+    "*.csproj",
+    "*.sln",
+    "*.yml",
+    "*.yaml",
+    "*.cs",
+    "*.xaml",
+    "typos.toml",
+    "bin/**",
+    "obj/**",
+    "packages/**",
+    ".vs/**",
+    ".git/**"
+]
+
+[default.extend-words]
+EdBindings = "EdBindings"
+HOTAS = "HOTAS"
+keybinding = "keybinding" 
+keybindings = "keybindings"
+gameplay = "gameplay"
+VoiceAttack = "VoiceAttack"
+codebase = "codebase"
+frameworking = "frameworking"
+analyzers = "analyzers"
+MinVer = "MinVer"
+nullable = "nullable"

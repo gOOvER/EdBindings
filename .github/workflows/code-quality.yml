@@ -373,17 +373,8 @@ jobs:
         
         echo "::endgroup::"
 
-    - name: 🔤 Spell check documentation
+    - name: 🔤 Spell check documentation  
       uses: crate-ci/typos@master
-      with:
-        files: '**/*.md **/*.txt'
-        config: |
-          [default.extend-words]
-          EdBindings = "EdBindings"
-          HOTAS = "HOTAS"
-          keybinding = "keybinding"
-          keybindings = "keybindings"
-          gameplay = "gameplay"
 
   # Quality summary report
   quality-summary:

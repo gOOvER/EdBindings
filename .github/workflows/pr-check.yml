@@ -304,14 +304,6 @@ jobs:
 
     - name: 📝 Spell check documentation
       uses: crate-ci/typos@master
-      with:
-        files: '*.md'
-        config: |
-          [default.extend-words]
-          EdBindings = "EdBindings"
-          HOTAS = "HOTAS"
-          keybinding = "keybinding"
-          keybindings = "keybindings"
 
   # PR validation summary
   pr-validation-summary:
