@@ -9,7 +9,7 @@
     <StartupObject />
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsNotAsErrors>CS8600;CS8601;CS8602;CS8603;CS8604</WarningsNotAsErrors>
+    <WarningsNotAsErrors>CS8600;CS8601;CS8602;CS8603;CS8604;CS0618</WarningsNotAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
