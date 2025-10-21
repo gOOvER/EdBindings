@@ -45,22 +45,40 @@ jobs:
     - name: Process coverage reports
       if: matrix.configuration == 'Debug'
       run: |
-        # Install reportgenerator for better coverage reports
+        Write-Host "Processing coverage reports..."
+
+        # Find all coverage files
+        $coverageFiles = Get-ChildItem -Recurse -Path "./coverage" -Filter "coverage.cobertura.xml"
+        Write-Host "Found $($coverageFiles.Count) coverage files:"
+        $coverageFiles | ForEach-Object { Write-Host "  - $($_.FullName)" }
+
+        # Create a merged coverage directory
+        New-Item -ItemType Directory -Path "./coverage/merged" -Force | Out-Null
+
+        # Copy the first coverage file to merged directory
+        if ($coverageFiles.Count -gt 0) {
+          $firstFile = $coverageFiles[0]
+          Copy-Item $firstFile.FullName "./coverage/merged/coverage.cobertura.xml"
+          Write-Host "Using coverage file: $($firstFile.FullName)"
+        }
+
+    - name: Generate HTML coverage report
+      if: matrix.configuration == 'Debug'
+      run: |
+        # Install reportgenerator for HTML reports
         dotnet tool install -g dotnet-reportgenerator-globaltool
 
-        # Generate coverage report
-        reportgenerator -reports:"./coverage/**/coverage.cobertura.xml" -targetdir:"./coverage/report" -reporttypes:"Html;Cobertura"
-
-        # Display coverage summary
-        Write-Host "Coverage Summary:"
-        Get-Content "./coverage/report/index.html" | Select-String -Pattern "Line coverage:" | ForEach-Object { Write-Host $_ }
+        # Generate HTML report
+        if (Test-Path "./coverage/merged/coverage.cobertura.xml") {
+          reportgenerator -reports:"./coverage/merged/coverage.cobertura.xml" -targetdir:"./coverage/report" -reporttypes:"Html"
+          Write-Host "HTML coverage report generated at ./coverage/report/"
+        }
 
     - name: Upload coverage reports to Codecov
       if: matrix.configuration == 'Debug'
       uses: codecov/codecov-action@v4
       with:
-        directory: ./coverage
-        files: ./coverage/**/coverage.cobertura.xml
+        file: ./coverage/merged/coverage.cobertura.xml
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: false
