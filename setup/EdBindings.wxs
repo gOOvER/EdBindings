@@ -3,7 +3,7 @@
   <Product Id="*" 
            Name="EdBindings" 
            Language="1033" 
-           Version="!(bind.fileVersion.EdBindings.exe)" 
+           Version="$(var.Version)" 
            Manufacturer="Elite Dangerous Community"
            UpgradeCode="12345678-1234-1234-1234-123456789012">
     

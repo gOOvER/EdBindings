@@ -1,4 +1,4 @@
-name: Release
+name: 📦 Release
 
 on:
   push:
@@ -63,21 +63,62 @@ jobs:
 
     - name: 🔨 Build MSI Installer (Automated)
       run: |
-        # Install WiX Toolset
+        # Install WiX Toolset v3.14 (latest stable)
         Write-Host "🔽 Installing WiX Toolset..." -ForegroundColor Cyan
-        Invoke-WebRequest -Uri "https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311.exe" -OutFile "wix311.exe"
-        Start-Process -FilePath "wix311.exe" -ArgumentList "/quiet" -Wait
+        $wixUrl = "https://github.com/wixtoolset/wix3/releases/download/wix314rtm/wix314.exe"
+        $wixInstaller = "wix314.exe"
         
-        # Add WiX to PATH
-        $wixPath = "${env:ProgramFiles(x86)}\WiX Toolset v3.11\bin"
+        Invoke-WebRequest -Uri $wixUrl -OutFile $wixInstaller
+        Write-Host "📦 Running WiX installer..." -ForegroundColor Cyan
+        Start-Process -FilePath $wixInstaller -ArgumentList "/quiet" -Wait
+        
+        # Add WiX to PATH (check multiple possible locations)
+        $possiblePaths = @(
+          "${env:ProgramFiles(x86)}\WiX Toolset v3.14\bin",
+          "${env:ProgramFiles}\WiX Toolset v3.14\bin",
+          "${env:ProgramFiles(x86)}\WiX Toolset v3.11\bin"
+        )
+        
+        $wixPath = $null
+        foreach ($path in $possiblePaths) {
+          if (Test-Path "$path\candle.exe") {
+            $wixPath = $path
+            Write-Host "✅ Found WiX at: $wixPath" -ForegroundColor Green
+            break
+          }
+        }
+        
+        if (-not $wixPath) {
+          Write-Host "❌ WiX installation failed or not found" -ForegroundColor Red
+          throw "WiX Toolset installation failed"
+        }
+        
         $env:PATH = "$wixPath;$env:PATH"
+        # Try alternative WiX installation if direct download fails
+        if (-not $wixPath) {
+          Write-Host "🔄 Trying alternative WiX installation via Chocolatey..." -ForegroundColor Yellow
+          try {
+            choco install wixtoolset -y
+            $wixPath = "${env:ProgramFiles(x86)}\WiX Toolset v3.11\bin"
+            if (Test-Path "$wixPath\candle.exe") {
+              $env:PATH = "$wixPath;$env:PATH"
+              Write-Host "✅ WiX installed via Chocolatey" -ForegroundColor Green
+            }
+          } catch {
+            Write-Host "⚠️ Chocolatey installation also failed" -ForegroundColor Yellow
+          }
+        }
         
-        # Create MSI using PowerShell script
+        # Create MSI using PowerShell script  
         Write-Host "🏗️ Building MSI installer..." -ForegroundColor Green
-        & .\setup\Build-MSI.ps1 -SourcePath "./publish/win-x64" -OutputPath "./publish" -Version "${{ steps.version.outputs.VERSION }}"
+        $buildSuccess = & .\setup\Build-MSI.ps1 -SourcePath "./publish/win-x64" -OutputPath "./publish" -Version $env:VERSION
+        
+        if (-not $buildSuccess) {
+          Write-Host "ℹ️ MSI build requires manual steps - check BUILD_INSTRUCTIONS.txt in release" -ForegroundColor Yellow
+        }
         
         # Fallback: Create detailed build guide if MSI build fails
-        if (-not (Test-Path "./publish/EdBindings-*.msi")) {
+        if (-not $buildSuccess -or -not (Test-Path "./publish/EdBindings-*.msi")) {
           Write-Host "⚠️ MSI build not completed, creating comprehensive build guide..." -ForegroundColor Yellow
           
           $buildGuide = @"
@@ -89,7 +130,7 @@ jobs:
         ### Method 1: WiX Toolset (Automated)
         ``````powershell
         # Run the automated build script
-        .\setup\Build-MSI.ps1 -SourcePath "./publish/win-x64" -OutputPath "./publish" -Version "${{ steps.version.outputs.VERSION }}"
+        .\setup\Build-MSI.ps1 -SourcePath "./publish/win-x64" -OutputPath "./publish" -Version $env:VERSION
         ``````
         
         ### Method 2: Visual Studio (Manual) 
