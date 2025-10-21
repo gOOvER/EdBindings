@@ -1,0 +1,84 @@
+---
+name: ✨ Feature Request
+about: Suggest a new feature or enhancement
+title: '[FEATURE] '
+labels: ['enhancement', 'needs-triage']
+assignees: ''
+---
+
+## ✨ Feature Description
+**Is your feature request related to a problem? Please describe.**
+A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+
+**Describe the solution you'd like**
+A clear and concise description of what you want to happen.
+
+## 🎯 Use Case
+**Who would benefit from this feature?**
+- [ ] Elite Dangerous players using complex control setups
+- [ ] VoiceAttack users
+- [ ] Streamers/Content creators
+- [ ] Accessibility users
+- [ ] Other: [Describe]
+
+**How would you use this feature?**
+Describe the specific scenario where this feature would be helpful.
+
+## 💡 Proposed Implementation
+**Describe alternatives you've considered**
+A clear and concise description of any alternative solutions or features you've considered.
+
+**UI/UX Suggestions**
+If this involves user interface changes, describe or sketch how it should look/work.
+
+## 📋 Requirements
+**Functional Requirements:**
+- [ ] Requirement 1
+- [ ] Requirement 2
+- [ ] Requirement 3
+
+**Technical Considerations:**
+- Elite Dangerous compatibility
+- Device support requirements
+- Performance impact
+- Configuration complexity
+
+## 🎨 Mockups/Examples
+**Visual Examples:**
+If applicable, add sketches, mockups, or examples from other applications.
+
+**Reference Applications:**
+Are there other tools that have similar functionality? How do they implement it?
+
+## 🔧 Elite Dangerous Integration
+**Binding File Support:**
+- [ ] Works with existing binding files
+- [ ] Requires binding file changes
+- [ ] Independent of binding files
+
+**Device Compatibility:**
+- [ ] All input devices
+- [ ] Specific device types: [List devices]
+- [ ] New device mapping required
+
+## 📊 Priority
+**How important is this feature to you?**
+- [ ] Critical - Blocks current workflow
+- [ ] High - Would significantly improve experience
+- [ ] Medium - Nice to have
+- [ ] Low - Minor improvement
+
+**Estimated Usage:**
+- [ ] Would use daily
+- [ ] Would use weekly
+- [ ] Would use occasionally
+- [ ] Would use rarely
+
+## 🔗 Related Issues
+**Are there related issues or feature requests?**
+- Relates to #[issue number]
+- Blocks #[issue number]
+- Depends on #[issue number]
+
+## 📝 Additional Context
+Add any other context, links, or information about the feature request here.

@@ -1,0 +1,143 @@
+---
+name: 📚 Documentation Issue
+about: Report documentation problems or suggest improvements
+title: '[DOCS] '
+labels: ['documentation', 'needs-triage']
+assignees: ''
+---
+
+## 📖 Documentation Issue Type
+**What kind of documentation issue is this?**
+- [ ] Missing documentation
+- [ ] Incorrect/outdated information
+- [ ] Confusing/unclear explanation
+- [ ] Broken links or references
+- [ ] Formatting/layout issues
+- [ ] Language/grammar improvements
+- [ ] Missing examples or tutorials
+- [ ] Installation/setup instructions
+- [ ] Other: [Describe]
+
+## 📍 Location
+**Where is the documentation issue located?**
+- [ ] README.md
+- [ ] Installation guide
+- [ ] User manual/wiki
+- [ ] Code comments
+- [ ] GitHub repository documentation
+- [ ] Release notes
+- [ ] Other: [Specify location]
+
+**Specific Section/Page:**
+[Provide link or describe the specific section]
+
+**Relevant File Path:**
+[If applicable, provide the file path]
+
+## ❌ Current State
+**What's currently wrong or missing?**
+Describe the specific documentation problem you've encountered.
+
+**Current Content:**
+[If applicable, quote the current text that needs improvement]
+
+## ✅ Suggested Improvement
+**What should it say instead?**
+Provide your suggestion for how the documentation could be improved.
+
+**Proposed Content:**
+[Provide suggested text, structure, or approach]
+
+## 👥 Target Audience
+**Who would benefit from this documentation improvement?**
+- [ ] New users
+- [ ] Experienced users
+- [ ] Elite Dangerous beginners
+- [ ] Advanced HOTAS users
+- [ ] Developers/contributors
+- [ ] System administrators
+- [ ] All users
+
+## 🎯 Use Case Context
+**What were you trying to accomplish?**
+Describe what you were trying to do when you encountered this documentation issue.
+
+**User Journey:**
+- Starting point: [Where did you begin]
+- Goal: [What you wanted to achieve]
+- Blocker: [Where the documentation failed you]
+
+## 📱 Access Method
+**How were you accessing the documentation?**
+- [ ] GitHub repository
+- [ ] Downloaded/offline
+- [ ] Mobile device
+- [ ] Desktop browser
+- [ ] Printed version
+- [ ] Other: [Describe]
+
+## 🔍 Discovery Context
+**How did you find this documentation issue?**
+- [ ] Following installation instructions
+- [ ] Trying to solve a problem
+- [ ] Learning how to use a feature
+- [ ] Contributing to the project
+- [ ] Reviewing documentation quality
+- [ ] Other: [Describe]
+
+## 💡 Enhancement Suggestions
+**Additional improvements:**
+Beyond fixing the specific issue, are there other related improvements you'd suggest?
+
+**Structure Suggestions:**
+- [ ] Add table of contents
+- [ ] Include more screenshots
+- [ ] Add video tutorials
+- [ ] Create quick start guide
+- [ ] Include troubleshooting section
+- [ ] Add FAQ section
+- [ ] Other: [Describe]
+
+## 🌐 Localization
+**Language/Region Considerations:**
+- [ ] This affects non-English speakers
+- [ ] Regional differences matter (UK vs US terminology)
+- [ ] Technical terms need clarification
+- [ ] Cultural context considerations
+
+## 📊 Priority Assessment
+**How important is this documentation fix?**
+- [ ] Critical - Blocks basic usage
+- [ ] High - Significantly impacts user experience
+- [ ] Medium - Helpful improvement
+- [ ] Low - Nice-to-have enhancement
+
+**Impact on Community:**
+- [ ] Many users likely affected
+- [ ] Specific user group affected
+- [ ] Edge case scenario
+- [ ] Personal preference
+
+## 🔗 Reference Materials
+**Helpful Resources:**
+If you know of good examples or references that could help improve this documentation, please share them.
+
+**Similar Projects:**
+Are there other projects with good documentation on this topic?
+
+## 🛠️ Contribution Offer
+**Would you like to help improve this documentation?**
+- [ ] Yes, I can submit a pull request
+- [ ] Yes, I can provide detailed content suggestions
+- [ ] Yes, I can review proposed changes
+- [ ] I prefer to let others handle the implementation
+
+**Your Background:**
+[Optional: Brief description of your experience with Elite Dangerous, HOTAS setups, or technical writing]
+
+## 📝 Additional Context
+**Screenshots or Examples:**
+If visual examples would help explain the documentation issue, please attach them.
+
+**Related Issues:**
+Are there other documentation issues or feature requests that relate to this one?

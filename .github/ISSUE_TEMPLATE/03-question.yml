@@ -1,0 +1,60 @@
+---
+name: ❓ General Question
+about: Ask a question about EdBindings usage or configuration
+title: '[QUESTION] '
+labels: ['question', 'needs-triage']
+assignees: ''
+---
+
+## ❓ Question
+**What would you like to know?**
+A clear and concise description of your question.
+
+## 🎮 Context
+**What are you trying to achieve?**
+Describe what you're trying to do with EdBindings and Elite Dangerous.
+
+**Current Setup:**
+- EdBindings Version: [e.g. v1.2.3]
+- Elite Dangerous Version: [e.g. Odyssey / Horizons]
+- Input Devices: [e.g. HOTAS, Gamepad, Keyboard+Mouse]
+- Device Mapping: [e.g. X56, Custom, None]
+
+## 🔍 What You've Tried
+**Research Done:**
+- [ ] Checked the README documentation
+- [ ] Searched existing issues
+- [ ] Looked at Elite Dangerous documentation
+- [ ] Asked in community forums
+- [ ] Tried different configurations
+
+**Specific Attempts:**
+Describe what you've already tried or looked into.
+
+## 📋 Related Information
+**Binding File Details:**
+- Using custom bindings: [Yes/No]
+- Specific binding categories: [e.g. Flight, SRV, On-foot]
+- Multiple binding sets: [Yes/No]
+
+**Screenshots:**
+If applicable, add screenshots of your current setup or configuration.
+
+## 🎯 Expected Outcome
+**What kind of answer are you looking for?**
+- [ ] Step-by-step instructions
+- [ ] Configuration examples
+- [ ] Troubleshooting help
+- [ ] General information
+- [ ] Best practices recommendations
+
+## 📚 Documentation
+**Would this question benefit from documentation?**
+If this is a common question, should it be added to documentation or FAQ?
+
+## 🔗 Related Resources
+**Relevant Links:**
+If you have links to related forum posts, videos, or documentation, include them here.
+
+## 📝 Additional Context
+Add any other context or information that might help answer your question.
