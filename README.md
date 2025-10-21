@@ -4,7 +4,9 @@ A Windows application for Elite Dangerous that reads and displays key binding fi
 
 [![.NET](https://img.shields.io/badge/.NET-8.0-blue)](https://dotnet.microsoft.com/download/dotnet/8.0)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](#)
+[![CI](https://github.com/gOOvER/EdBindings/actions/workflows/ci.yml/badge.svg)](https://github.com/gOOvER/EdBindings/actions/workflows/ci.yml)
+[![Security Scan](https://github.com/gOOvER/EdBindings/actions/workflows/security.yml/badge.svg)](https://github.com/gOOvER/EdBindings/actions/workflows/security.yml)
+[![Release](https://github.com/gOOvER/EdBindings/actions/workflows/release.yml/badge.svg)](https://github.com/gOOvER/EdBindings/actions/workflows/release.yml)
 
 <img src="https://raw.githubusercontent.com/ghorsey/EdBindings/main/assets/edbindings.screenshot.gif">
 
@@ -39,7 +41,7 @@ A Windows application for Elite Dangerous that reads and displays key binding fi
 }
 ```
 
-See [X56.json](https://github.com/ghorsey/EdBindings/blob/main/src/EdBindings/DeviceMappings/X56.json) for a complete example.
+See [X56.json](https://github.com/gOOvER/EdBindings/blob/main/src/EdBindings/DeviceMappings/X56.json) for a complete example.
 
 ## Building from Source
 

@@ -1,0 +1,135 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v1.2.3)'
+        required: true
+        type: string
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Required for MinVer
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Run tests
+      run: dotnet test --configuration Release --verbosity normal
+
+    - name: Build Release
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Publish Windows x64
+      run: dotnet publish src/EdBindings/EdBindings.csproj --configuration Release --runtime win-x64 --self-contained true --output ./publish/win-x64
+
+    - name: Publish Windows x86
+      run: dotnet publish src/EdBindings/EdBindings.csproj --configuration Release --runtime win-x86 --self-contained true --output ./publish/win-x86
+
+    - name: Build MSI Installer (x64)
+      run: |
+        # Note: This requires Visual Studio Build Tools with VDPROJ support
+        # For now, we'll create a note about manual MSI build requirement
+        echo "MSI build requires Visual Studio with VDPROJ extension" > ./publish/MSI_BUILD_NOTES.txt
+        echo "Build the setup project manually in Visual Studio after release" >> ./publish/MSI_BUILD_NOTES.txt
+
+    - name: Create ZIP archives
+      run: |
+        Compress-Archive -Path "./publish/win-x64/*" -DestinationPath "./EdBindings-win-x64.zip"
+        Compress-Archive -Path "./publish/win-x86/*" -DestinationPath "./EdBindings-win-x86.zip"
+
+    - name: Get version
+      id: version
+      run: |
+        if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+          $version = "${{ github.event.inputs.version }}"
+        } else {
+          $version = $env:GITHUB_REF -replace 'refs/tags/', ''
+        }
+        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        echo "Version: $version"
+
+    - name: Create Release Notes
+      id: release_notes
+      run: |
+        $version = "${{ steps.version.outputs.VERSION }}"
+        $notes = @"
+        ## EdBindings $version
+
+        ### What's Changed
+        - Built with .NET 8.0 for improved performance and security
+        - Modern Windows 11-style user interface
+        - Enhanced key binding visualization for Elite Dangerous
+
+        ### Downloads
+        - **Windows x64**: EdBindings-win-x64.zip (Recommended for 64-bit Windows)
+        - **Windows x86**: EdBindings-win-x86.zip (For 32-bit Windows)
+
+        ### System Requirements
+        - Windows 10 version 1809 or later
+        - .NET 8.0 Runtime (included in self-contained builds)
+
+        ### Installation
+        1. Download the appropriate ZIP file for your system
+        2. Extract to a folder of your choice
+        3. Run EdBindings.exe
+
+        For MSI installer, please check the setup folder in the source code.
+        "@
+
+        $notes | Out-File -FilePath "./release_notes.md" -Encoding utf8
+        echo "NOTES_FILE=./release_notes.md" >> $env:GITHUB_OUTPUT
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.version.outputs.VERSION }}
+        name: EdBindings ${{ steps.version.outputs.VERSION }}
+        body_path: ${{ steps.release_notes.outputs.NOTES_FILE }}
+        draft: false
+        prerelease: ${{ contains(steps.version.outputs.VERSION, '-') }}
+        files: |
+          ./EdBindings-win-x64.zip
+          ./EdBindings-win-x86.zip
+          ./publish/MSI_BUILD_NOTES.txt
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: EdBindings-Release-${{ steps.version.outputs.VERSION }}
+        path: |
+          ./publish/
+          ./EdBindings-*.zip
+        retention-days: 90

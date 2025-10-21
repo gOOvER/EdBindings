@@ -14,7 +14,7 @@
         /// </summary>
         /// <param name="element">The element.</param>
         /// <returns>EdBindings.Model.BindingsRaw.Bindings.Binding.</returns>
-        public static Binding MakeBindingGroup(XElement element)
+        public static Binding? MakeBindingGroup(XElement element)
         {
             if (!element.HasElements)
             {
@@ -23,7 +23,7 @@
 
             return new BindingGroup(
                 Name: element.Name.LocalName,
-                Bindings: element.Descendants().Select(element => MakeBinding(element)).ToList());
+                Bindings: element.Descendants().Select(element => MakeBinding(element)).Where(b => b != null).ToList()!);
         }
     }
 }

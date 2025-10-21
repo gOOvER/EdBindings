@@ -1,0 +1,50 @@
+name: Dependency Update Check
+
+on:
+  schedule:
+    # Run every Monday at 9:00 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+jobs:
+  check-updates:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Install dotnet-outdated tool
+      run: dotnet tool install --global dotnet-outdated-tool
+
+    - name: Check for outdated packages
+      run: |
+        echo "# Outdated NuGet Packages Report" > outdated-report.md
+        echo "Generated on $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') UTC" >> outdated-report.md
+        echo "" >> outdated-report.md
+
+        try {
+          $output = dotnet outdated --include-auto-references 2>&1
+          if ($output -match "No outdated packages found") {
+            echo "✅ All packages are up to date!" >> outdated-report.md
+          } else {
+            echo "## Outdated Packages Found:" >> outdated-report.md
+            echo '```' >> outdated-report.md
+            echo $output >> outdated-report.md
+            echo '```' >> outdated-report.md
+          }
+        } catch {
+          echo "❌ Error checking for outdated packages: $_" >> outdated-report.md
+        }
+
+    - name: Upload outdated packages report
+      uses: actions/upload-artifact@v4
+      with:
+        name: outdated-packages-report
+        path: outdated-report.md
+        retention-days: 30

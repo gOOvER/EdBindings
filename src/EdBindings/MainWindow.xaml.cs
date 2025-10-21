@@ -20,7 +20,7 @@
         /// <summary>
         /// The place holder text
         /// </summary>
-        private const string PlaceHolderText = "Filter...";
+        private const string PlaceHolderText = "Search bindings...";
 
         /// <summary>
         /// Gets or sets the binding file.
@@ -154,7 +154,7 @@
                     ApplicationSettings.Default.Save();
                 }
 
-                DeviceFileStatusBar.Content = $"Device Mapping: {menuItem.Header}";
+                DeviceFileStatusBar.Text = $"Device Mapping: {menuItem.Header}";
                 ProcessBindingFile();
             }
             catch (Exception ex)
@@ -224,8 +224,8 @@
                 KeyBindings = filterable.View;
 
                 KeyBindingDataGrid.ItemsSource = KeyBindings;
-                BindingFileStatusBar.Content = Path.GetFileName(BindingFile.FileName);
-                KeyboardLayoutStatusBar.Content = BindingFile.KeyboardLayout;
+                BindingFileStatusBar.Text = Path.GetFileName(BindingFile.FileName);
+                KeyboardLayoutStatusBar.Text = BindingFile.KeyboardLayout;
                 txtFilter.Text = PlaceHolderText;
             }
             catch (Exception ex)
@@ -310,6 +310,21 @@
             {
                 MessageBox.Show($"Error opening About dialog: {ex.Message}",
                     "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Clears the filter text.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        private void ClearFilterClick(object sender, RoutedEventArgs e)
+        {
+            txtFilter.Text = PlaceHolderText;
+            txtFilter.Focus();
+            if (KeyBindings != null)
+            {
+                KeyBindings.Filter = null;
             }
         }
     }

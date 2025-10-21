@@ -5,47 +5,195 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EdBindings"
         mc:Ignorable="d"
-        Title="ED:Bindings" Height="450" Width="800" Icon="/joystick.ico">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Menu Grid.Row="0" Grid.Column="1" Name="MainMenu">
-            <MenuItem Header="_File">
-                <MenuItem Header="_Open Bindings" Click="FileOpenBindingsMenuItemClick" />
-                <MenuItem Header="E_xit" Click="FileExitMenuItemClick"/>
+        Title="ED:Bindings - Elite Dangerous Key Binding Viewer"
+        Height="700" Width="1200"
+        MinHeight="500" MinWidth="800"
+        Icon="/joystick.ico"
+        Background="{StaticResource BackgroundBrush}"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <!-- Search Icon Geometry -->
+        <Geometry x:Key="SearchIcon">M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z</Geometry>
+    </Window.Resources>
+
+    <DockPanel>
+        <!-- Modern Menu Bar -->
+        <Menu DockPanel.Dock="Top" Background="{StaticResource SurfaceBrush}"
+              BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
+            <MenuItem Header="_File" Padding="12,8">
+                <MenuItem Header="_Open Bindings..." InputGestureText="Ctrl+O" Click="FileOpenBindingsMenuItemClick">
+                    <MenuItem.Icon>
+                        <Path Data="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
+                              Fill="{StaticResource TextBrush}" Width="16" Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="E_xit" InputGestureText="Alt+F4" Click="FileExitMenuItemClick">
+                    <MenuItem.Icon>
+                        <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
+                              Fill="{StaticResource TextBrush}" Width="16" Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
-            <MenuItem Header="_Device Mappings" Name="DeviceMappingMenu"/>
-            <MenuItem Header="_Help">
-                <MenuItem Header="_About" Click="MenuItemClick"/>
+
+            <MenuItem Header="_Device Mappings" Name="DeviceMappingMenu" Padding="12,8">
+                <MenuItem.Icon>
+                    <Path Data="M17,7H22V17H17V19A1,1 0 0,0 18,20H20V22H16C15.45,22 15,21.55 15,21V3C15,2.45 15.45,2 16,2H20V4H18A1,1 0 0,0 17,5V7M2,7H13V9H4V15H13V17H2V7M20,15V9H17V15H20Z"
+                          Fill="{StaticResource TextBrush}" Width="16" Height="16"/>
+                </MenuItem.Icon>
+            </MenuItem>
+
+            <MenuItem Header="_Help" Padding="12,8">
+                <MenuItem Header="_About ED:Bindings" Click="MenuItemClick">
+                    <MenuItem.Icon>
+                        <Path Data="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"
+                              Fill="{StaticResource TextBrush}" Width="16" Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
         </Menu>
-        <TextBox Grid.Row="1" Name="txtFilter" KeyUp="TxtFilterKeyUp" Text="Filter..." GotFocus="TxtFilterGotFocus" LostFocus="TxtFilterLostFocus"/>
-        <DataGrid Grid.Row="2" Name="KeyBindingDataGrid" AlternatingRowBackground="LightBlue" AlternationCount="2" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Area" Binding="{Binding Area}"/>
-                <DataGridTextColumn Header="Category" Binding="{Binding Category}"/>
-                <DataGridTextColumn Header="Action" Binding="{Binding Action}"/>
-                <DataGridTextColumn Header="Primary Device" Binding="{Binding PrimaryDevice}"/>
-                <DataGridTextColumn Header="Primary Key" Binding="{Binding PrimaryKey}"/>
-                <DataGridTextColumn Header="Secondary Device" Binding="{Binding SecondaryDevice}"/>
-                <DataGridTextColumn Header="Secondary Key" Binding="{Binding SecondaryKey}"/>
-                <DataGridTextColumn Header="VoiceAttack/BindED Variable" Binding="{Binding BindEdVariable}"/>
-            </DataGrid.Columns>
-        </DataGrid>
 
-        <StatusBar Grid.Row="3">
-            <StatusBarItem Content="SampleContent" Name="DeviceFileStatusBar"/>
-            <Separator/>
-            <StatusBarItem Content="Keyboard Layout" Name="KeyboardLayoutStatusBar"/>
-            <Separator/>
-            <StatusBarItem Content="Open a Bindings File" Name="BindingFileStatusBar"/>
+        <!-- Status Bar -->
+        <StatusBar DockPanel.Dock="Bottom" Background="{StaticResource SurfaceBrush}"
+                   BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0"
+                   Padding="8,4">
+            <StatusBarItem>
+                <StackPanel Orientation="Horizontal">
+                    <Path Data="M17,7H22V17H17V19A1,1 0 0,0 18,20H20V22H16C15.45,22 15,21.55 15,21V3C15,2.45 15.45,2 16,2H20V4H18A1,1 0 0,0 17,5V7M2,7H13V9H4V15H13V17H2V7M20,15V9H17V15H20Z"
+                          Fill="{StaticResource TextBrush}" Width="12" Height="12"
+                          Margin="0,0,6,0"/>
+                    <TextBlock Name="DeviceFileStatusBar" Text="No device mapping selected"
+                               Foreground="{StaticResource TextBrush}"/>
+                </StackPanel>
+            </StatusBarItem>
+
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+
+            <StatusBarItem>
+                <StackPanel Orientation="Horizontal">
+                    <Path Data="M20,5H4C2.89,5 2,5.89 2,7V17C2,18.11 2.89,19 4,19H20C21.11,19 22,18.11 22,17V7C22,5.89 21.11,5 20,5M20,17H4V7H20V17M5,8V16H19V8H5M6,9H18V15H6V9Z"
+                          Fill="{StaticResource TextBrush}" Width="12" Height="12"
+                          Margin="0,0,6,0"/>
+                    <TextBlock Name="KeyboardLayoutStatusBar" Text="Keyboard Layout"
+                               Foreground="{StaticResource TextBrush}"/>
+                </StackPanel>
+            </StatusBarItem>
+
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+
+            <StatusBarItem>
+                <StackPanel Orientation="Horizontal">
+                    <Path Data="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
+                          Fill="{StaticResource TextBrush}" Width="12" Height="12"
+                          Margin="0,0,6,0"/>
+                    <TextBlock Name="BindingFileStatusBar" Text="Open a Bindings File"
+                               Foreground="{StaticResource TextBrush}"/>
+                </StackPanel>
+            </StatusBarItem>
         </StatusBar>
-    </Grid>
+
+        <!-- Main Content Area -->
+        <Grid Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="16"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Modern Search Bar -->
+            <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                    CornerRadius="6" Padding="12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Search Icon -->
+                    <Path Grid.Column="0" Data="{StaticResource SearchIcon}"
+                          Fill="{StaticResource DisabledBrush}" Width="16" Height="16"
+                          Margin="0,0,12,0" VerticalAlignment="Center"/>
+
+                    <!-- Search TextBox -->
+                    <TextBox Grid.Column="1" Name="txtFilter"
+                             Style="{StaticResource ModernTextBoxStyle}"
+                             BorderThickness="0" Background="Transparent"
+                             KeyUp="TxtFilterKeyUp" GotFocus="TxtFilterGotFocus"
+                             LostFocus="TxtFilterLostFocus"
+                             FontSize="14" VerticalContentAlignment="Center"
+                             Text="Search bindings..."/>
+
+                    <!-- Clear Button -->
+                    <Button Grid.Column="2" Content="✕"
+                            Background="Transparent" BorderThickness="0"
+                            Foreground="{StaticResource DisabledBrush}"
+                            Padding="8,4" Margin="8,0,0,0"
+                            Cursor="Hand" ToolTip="Clear search"
+                            Click="ClearFilterClick"/>
+                </Grid>
+            </Border>
+
+            <!-- Modern DataGrid -->
+            <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                    CornerRadius="6">
+                <DataGrid Name="KeyBindingDataGrid"
+                          AutoGenerateColumns="False" CanUserAddRows="False"
+                          CanUserDeleteRows="False" IsReadOnly="True"
+                          CanUserSortColumns="True" CanUserReorderColumns="True"
+                          VirtualizingPanel.IsVirtualizing="True"
+                          VirtualizingPanel.VirtualizationMode="Recycling"
+                          EnableRowVirtualization="True">
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Area" Binding="{Binding Area}" Width="100" MinWidth="80"/>
+                        <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="120" MinWidth="100"/>
+                        <DataGridTextColumn Header="Action" Binding="{Binding Action}" Width="200" MinWidth="150"/>
+                        <DataGridTextColumn Header="Primary Device" Binding="{Binding PrimaryDevice}" Width="150" MinWidth="120"/>
+                        <DataGridTextColumn Header="Primary Key" Binding="{Binding PrimaryKey}" Width="150" MinWidth="120"/>
+                        <DataGridTextColumn Header="Secondary Device" Binding="{Binding SecondaryDevice}" Width="150" MinWidth="120"/>
+                        <DataGridTextColumn Header="Secondary Key" Binding="{Binding SecondaryKey}" Width="150" MinWidth="120"/>
+                        <DataGridTextColumn Header="VoiceAttack/BindED Variable" Binding="{Binding BindEdVariable}" Width="*" MinWidth="180"/>
+                    </DataGrid.Columns>
+
+                    <!-- Empty State Template -->
+                    <DataGrid.Style>
+                        <Style TargetType="DataGrid" BasedOn="{StaticResource ModernDataGridStyle}">
+                            <Style.Triggers>
+                                <Trigger Property="HasItems" Value="False">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="DataGrid">
+                                                <Border Background="{TemplateBinding Background}"
+                                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                                        BorderThickness="{TemplateBinding BorderThickness}">
+                                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                                Margin="40">
+                                                        <Path Data="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
+                                                              Fill="{StaticResource DisabledBrush}" Width="48" Height="48"
+                                                              HorizontalAlignment="Center" Margin="0,0,0,16"/>
+                                                        <TextBlock Text="No bindings loaded"
+                                                                   FontSize="18" FontWeight="SemiBold"
+                                                                   Foreground="{StaticResource DisabledBrush}"
+                                                                   HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                                        <TextBlock Text="Open a bindings file from the File menu to get started"
+                                                                   FontSize="14"
+                                                                   Foreground="{StaticResource DisabledBrush}"
+                                                                   HorizontalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.Style>
+                </DataGrid>
+            </Border>
+        </Grid>
+    </DockPanel>
 </Window>

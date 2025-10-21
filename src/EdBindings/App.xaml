@@ -4,6 +4,93 @@
              xmlns:local="clr-namespace:EdBindings"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Modern Windows 11 Style Colors -->
+                <ResourceDictionary>
+                    <SolidColorBrush x:Key="PrimaryBrush" Color="#0078D4"/>
+                    <SolidColorBrush x:Key="PrimaryHoverBrush" Color="#106EBE"/>
+                    <SolidColorBrush x:Key="AccentBrush" Color="#005A9E"/>
+                    <SolidColorBrush x:Key="BackgroundBrush" Color="#F3F2F1"/>
+                    <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF"/>
+                    <SolidColorBrush x:Key="BorderBrush" Color="#E1DFDD"/>
+                    <SolidColorBrush x:Key="TextBrush" Color="#323130"/>
+                    <SolidColorBrush x:Key="DisabledBrush" Color="#A19F9D"/>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Modern Button Style -->
+            <Style x:Key="ModernButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Padding" Value="16,8"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}"
+                                    CornerRadius="4"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource PrimaryHoverBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Modern TextBox Style -->
+            <Style x:Key="ModernTextBoxStyle" TargetType="TextBox">
+                <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Padding" Value="12,8"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="TextBox">
+                            <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="4">
+                                <ScrollViewer x:Name="PART_ContentHost"
+                                            Padding="{TemplateBinding Padding}"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsFocused" Value="True">
+                                    <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+                                    <Setter Property="BorderThickness" Value="2"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Modern DataGrid Style -->
+            <Style x:Key="ModernDataGridStyle" TargetType="DataGrid">
+                <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+                <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource BorderBrush}"/>
+                <Setter Property="AlternatingRowBackground" Value="#F9F9F9"/>
+                <Setter Property="RowBackground" Value="{StaticResource SurfaceBrush}"/>
+                <Setter Property="HeadersVisibility" Value="Column"/>
+                <Setter Property="CanUserResizeRows" Value="False"/>
+                <Setter Property="SelectionMode" Value="Single"/>
+                <Setter Property="SelectionUnit" Value="FullRow"/>
+            </Style>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

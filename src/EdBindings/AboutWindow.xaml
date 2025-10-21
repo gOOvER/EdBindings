@@ -5,25 +5,158 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EdBindings"
         mc:Ignorable="d"
-        Title="About EdBindings" Height="450" Width="800" ResizeMode="NoResize" ShowInTaskbar="False" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterOwner" WindowStyle="None" Margin="10,10,10,10">
-    <Grid>
-        <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Span FontSize="26" FontWeight="Bold">EdBindings</Span>
-                <Span FontSize="10"><Run Text="{Binding VersionString}"/></Span>
-            </TextBlock>
-            <TextBlock HorizontalAlignment="Center" FontSize="10">Copyright © 2021</TextBlock>
-            <TextBlock HorizontalAlignment="Center">Geoff Horsey (CMDR Erudine)</TextBlock>
-            <TextBlock HorizontalAlignment="Center">
-                <Hyperlink NavigateUri="https://github.com/ghorsey/EdBindings" RequestNavigate="HyperlinkRequestNavigate">Website</Hyperlink><LineBreak/>
-                <Hyperlink NavigateUri="https://github.com/ghorsey/EdBindings/blob/main/LICENSE" RequestNavigate="HyperlinkRequestNavigate">License</Hyperlink>
-            </TextBlock>
-            <TextBlock FontSize="9" Margin="0 10">
-                App Icon made by
-                <Hyperlink NavigateUri="https://www.flaticon.com/authors/nikita-golubev" RequestNavigate="HyperlinkRequestNavigate">Nikita Golubev</Hyperlink> from
-                <Hyperlink NavigateUri="https://www.flaticon.com/" RequestNavigate="HyperlinkRequestNavigate">www.flaticon.com</Hyperlink>
-            </TextBlock>
-            <Button Content="Close" Name="CloseButton" Click="CloseButtonClick"/>
-        </StackPanel> 
-    </Grid>
+        Title="About ED:Bindings"
+        Height="500" Width="450"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BackgroundBrush}"
+        AllowsTransparency="False"
+        WindowStyle="SingleBorderWindow">
+
+    <Border Background="{StaticResource SurfaceBrush}"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1"
+            CornerRadius="8"
+            Margin="16">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0"
+                    Background="{StaticResource PrimaryBrush}"
+                    CornerRadius="8,8,0,0"
+                    Padding="24,20">
+                <StackPanel HorizontalAlignment="Center">
+                    <!-- App Icon -->
+                    <Border Background="White"
+                            CornerRadius="12"
+                            Padding="12"
+                            Margin="0,0,0,16">
+                        <Path Data="M17,7H22V17H17V19A1,1 0 0,0 18,20H20V22H16C15.45,22 15,21.55 15,21V3C15,2.45 15.45,2 16,2H20V4H18A1,1 0 0,0 17,5V7M2,7H13V9H4V15H13V17H2V7M20,15V9H17V15H20Z"
+                              Fill="{StaticResource PrimaryBrush}"
+                              Width="32" Height="32"/>
+                    </Border>
+
+                    <!-- App Title -->
+                    <TextBlock Text="ED:Bindings"
+                               FontSize="28"
+                               FontWeight="Bold"
+                               Foreground="White"
+                               HorizontalAlignment="Center"/>
+
+                    <!-- Version -->
+                    <TextBlock Text="{Binding VersionString}"
+                               FontSize="14"
+                               Foreground="#E0FFFFFF"
+                               HorizontalAlignment="Center"
+                               Margin="0,4,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Content -->
+            <ScrollViewer Grid.Row="1"
+                          VerticalScrollBarVisibility="Auto"
+                          Padding="24,20">
+                <StackPanel>
+                    <!-- Description -->
+                    <TextBlock Text="Elite Dangerous Key Binding Viewer"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource TextBrush}"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,20"/>
+
+                    <!-- Features -->
+                    <TextBlock Text="Features:"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource TextBrush}"
+                               Margin="0,0,0,8"/>
+
+                    <TextBlock TextWrapping="Wrap"
+                               Foreground="{StaticResource TextBrush}"
+                               LineHeight="20"
+                               Margin="0,0,0,16">
+                        • View and search Elite Dangerous key bindings<LineBreak/>
+                        • Device mapping support for custom controllers<LineBreak/>
+                        • VoiceAttack/BindED integration<LineBreak/>
+                        • Modern, user-friendly interface
+                    </TextBlock>
+
+                    <!-- Developer Info -->
+                    <Border Background="{StaticResource BackgroundBrush}"
+                            BorderBrush="{StaticResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="16"
+                            Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock Text="Developer"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextBrush}"
+                                       Margin="0,0,0,8"/>
+                            <TextBlock Text="Geoff Horsey (CMDR Erudine)"
+                                       Foreground="{StaticResource TextBrush}"/>
+                            <TextBlock Text="Updated by gOOvER"
+                                       Foreground="{StaticResource TextBrush}"
+                                       FontSize="12"
+                                       Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Links -->
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Margin="0,0,0,16">
+                        <Button Content="🌐 Website"
+                                Style="{StaticResource ModernButtonStyle}"
+                                Background="Transparent"
+                                Foreground="{StaticResource PrimaryBrush}"
+                                BorderBrush="{StaticResource PrimaryBrush}"
+                                BorderThickness="1"
+                                Margin="0,0,8,0"
+                                Padding="12,6"
+                                Click="WebsiteButtonClick"/>
+
+                        <Button Content="📄 License"
+                                Style="{StaticResource ModernButtonStyle}"
+                                Background="Transparent"
+                                Foreground="{StaticResource PrimaryBrush}"
+                                BorderBrush="{StaticResource PrimaryBrush}"
+                                BorderThickness="1"
+                                Padding="12,6"
+                                Click="LicenseButtonClick"/>
+                    </StackPanel>
+
+                    <!-- Attribution -->
+                    <TextBlock TextWrapping="Wrap"
+                               FontSize="11"
+                               Foreground="{StaticResource DisabledBrush}"
+                               HorizontalAlignment="Center">
+                        App Icon by Nikita Golubev from www.flaticon.com
+                    </TextBlock>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Footer -->
+            <Border Grid.Row="2"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="0,1,0,0"
+                    Padding="24,16">
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+                    <Button Content="Close"
+                            Name="CloseButton"
+                            Style="{StaticResource ModernButtonStyle}"
+                            Click="CloseButtonClick"
+                            Padding="20,8"
+                            MinWidth="80"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
 </Window>

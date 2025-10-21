@@ -14,7 +14,7 @@
         /// </summary>
         /// <param name="element">The element.</param>
         /// <returns>EdBindings.Model.BindingsRaw.Bindings.Binding.</returns>
-        public static Binding MakeBindingValue(XElement element)
+        public static Binding? MakeBindingValue(XElement element)
         {
             if (!element.Attributes().Any(attribute => attribute.Name == "Value"))
             {
@@ -22,8 +22,8 @@
             }
 
             return new BindingValue(
-                Name: element.Name.LocalName, 
-                Value: element.Attribute("Value").Value);
+                Name: element.Name.LocalName,
+                Value: element.Attribute("Value")?.Value ?? "");
         }
     }
 }

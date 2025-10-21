@@ -13,7 +13,7 @@
         /// </summary>
         /// <param name="element">The element.</param>
         /// <returns>EdBindings.Model.BindingsRaw.Bindings.Binding.</returns>
-        public static Binding MakeBindingDevice(XElement element)
+        public static Binding? MakeBindingDevice(XElement element)
         {
             if(!element.Attributes().Any(attribute => attribute.Name == "Device"))
             {
@@ -22,8 +22,8 @@
 
             return new BindingDevice(
                 Name: element.Name.LocalName,
-                Device: element.Attribute("Device").Value,
-                Key: element.Attribute("Key").Value);
+                Device: element.Attribute("Device")?.Value ?? "",
+                Key: element.Attribute("Key")?.Value ?? "");
         }
     }
 }
