@@ -217,12 +217,17 @@ jobs:
 
     - name: 🔧 Install analysis tools
       run: |
-        # Install StyleCop analyzers
-        dotnet add package StyleCop.Analyzers --version 1.2.0-beta.556
+        # Install StyleCop analyzers for main project
+        dotnet add src/EdBindings/EdBindings.csproj package StyleCop.Analyzers --version 1.2.0-beta.556
         
-        # Install Microsoft Code Analysis
-        dotnet add package Microsoft.CodeAnalysis.Analyzers --version 3.3.4
-        dotnet add package Microsoft.CodeAnalysis.NetAnalyzers --version 8.0.0
+        # Install StyleCop analyzers for model project  
+        dotnet add src/EdBindings.Model.BindingsRaw/EdBindings.Model.csproj package StyleCop.Analyzers --version 1.2.0-beta.556
+        
+        # Install Microsoft Code Analysis for main project
+        dotnet add src/EdBindings/EdBindings.csproj package Microsoft.CodeAnalysis.NetAnalyzers --version 8.0.0
+        
+        # Install Microsoft Code Analysis for model project
+        dotnet add src/EdBindings.Model.BindingsRaw/EdBindings.Model.csproj package Microsoft.CodeAnalysis.NetAnalyzers --version 8.0.0
 
     - name: 🏗️ Build with enhanced analysis
       run: |
