@@ -13,7 +13,7 @@
         /// Gets or sets the version string.
         /// </summary>
         /// <value>The version string.</value>
-        public string VersionString { get; set; }
+        public string VersionString { get; set; } = string.Empty;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AboutWindow"/> class.
@@ -22,7 +22,7 @@
         {
             InitializeComponent();
             SetVersion();
-            this.DataContext = this;
+            DataContext = this;
         }
 
         /// <summary>
@@ -30,9 +30,18 @@
         /// </summary>
         private void SetVersion()
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            var versionInfo = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-            this.VersionString = $"v{versionInfo.InformationalVersion}";
+            try
+            {
+                var assembly = Assembly.GetExecutingAssembly();
+                var versionInfo = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+                VersionString = versionInfo?.InformationalVersion != null
+                    ? $"v{versionInfo.InformationalVersion}"
+                    : "Unknown Version";
+            }
+            catch
+            {
+                VersionString = "Unknown Version";
+            }
         }
         /// <summary>
         /// Closes the button click.

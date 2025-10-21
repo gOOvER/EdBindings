@@ -15,13 +15,13 @@
         /// Gets or sets the name of the file.
         /// </summary>
         /// <value>The name of the file.</value>
-        public string FileName { get; init; }
+        public string FileName { get; init; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the keyboard layout.
         /// </summary>
         /// <value>The keyboard layout.</value>
-        public string KeyboardLayout { get; init; }
+        public string KeyboardLayout { get; init; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the bindings.

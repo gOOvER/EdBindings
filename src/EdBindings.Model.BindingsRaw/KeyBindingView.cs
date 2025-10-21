@@ -17,49 +17,49 @@
         /// Gets or sets the area.
         /// </summary>
         /// <value>The area.</value>
-        public string Area { get; set; }
+        public string Area { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the category.
         /// </summary>
         /// <value>The category.</value>
-        public string Category { get; set; }
+        public string Category { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the action.
         /// </summary>
         /// <value>The action.</value>
-        public string Action { get; set; }
+        public string Action { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the primary device.
         /// </summary>
         /// <value>The primary device.</value>
-        public string PrimaryDevice { get; set; }
+        public string PrimaryDevice { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the primary key.
         /// </summary>
         /// <value>The primary key.</value>
-        public string PrimaryKey { get; set; }
+        public string PrimaryKey { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the secondary device.
         /// </summary>
         /// <value>The secondary device.</value>
-        public string SecondaryDevice { get; set; }
+        public string? SecondaryDevice { get; set; }
 
         /// <summary>
         /// Gets or sets the secondary key.
         /// </summary>
         /// <value>The secondary key.</value>
-        public string SecondaryKey { get; set; }
+        public string? SecondaryKey { get; set; }
 
         /// <summary>
         /// Gets or sets the bind ed variable.
         /// </summary>
         /// <value>The bind ed variable.</value>
-        public string BindEdVariable { get; set; }
+        public string BindEdVariable { get; set; } = string.Empty;
 
 
         /// <summary>
@@ -72,21 +72,33 @@
         {
             var view = new KeyBindingView();
 
-            var actionMapping = actionMappings.FirstOrDefault(am => am.Code.Equals(group.Name, StringComparison.OrdinalIgnoreCase));
+            var actionMapping = actionMappings.FirstOrDefault(am =>
+                am.Code?.Equals(group.Name, StringComparison.OrdinalIgnoreCase) == true);
             view.Area = actionMapping?.Area ?? string.Empty;
             view.Category = actionMapping?.Category ?? string.Empty;
-            view.Action = actionMapping?.Action ?? group.Name;
+            view.Action = actionMapping?.Action ?? group.Name ?? string.Empty;
 
-            var primary = (BindingDevice)group.Bindings.First(b => new[] { "Binding", "Primary" }.Contains(b.Name));
-            var primaryDeviceMap = deviceMap.FindControlMap(primary);
-            var secondary = (BindingDevice)group.Bindings.FirstOrDefault(b => b.Name == "Secondary");
-            var secondaryDeviceMap = deviceMap.FindControlMap(secondary);
+            var primary = group.Bindings.OfType<BindingDevice>()
+                .FirstOrDefault(b => new[] { "Binding", "Primary" }.Contains(b.Name));
 
-            view.PrimaryDevice = primaryDeviceMap?.DeviceName ?? primary.Device;
-            view.PrimaryKey = primaryDeviceMap?.ControlLabel ?? primary.Key;
-            view.SecondaryDevice = secondaryDeviceMap?.DeviceName ?? secondary?.Device;
-            view.SecondaryKey = secondaryDeviceMap?.ControlLabel ?? secondary?.Key;
-            view.BindEdVariable = $"ed{group.Name}";
+            if (primary != null)
+            {
+                var primaryDeviceMap = deviceMap.FindControlMap(primary);
+                view.PrimaryDevice = primaryDeviceMap?.DeviceName ?? primary.Device ?? string.Empty;
+                view.PrimaryKey = primaryDeviceMap?.ControlLabel ?? primary.Key ?? string.Empty;
+            }
+
+            var secondary = group.Bindings.OfType<BindingDevice>()
+                .FirstOrDefault(b => b.Name == "Secondary");
+
+            if (secondary != null)
+            {
+                var secondaryDeviceMap = deviceMap.FindControlMap(secondary);
+                view.SecondaryDevice = secondaryDeviceMap?.DeviceName ?? secondary.Device;
+                view.SecondaryKey = secondaryDeviceMap?.ControlLabel ?? secondary.Key;
+            }
+
+            view.BindEdVariable = $"ed{group.Name ?? "Unknown"}";
 
             return view;
         }

@@ -2,7 +2,6 @@
 {
     using EdBindings.Model;
     using EdBindings.Model.BindingsRaw;
-
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
@@ -21,31 +20,31 @@
         /// <summary>
         /// The place holder text
         /// </summary>
-        private const string placeHolderText = "Filter...";
+        private const string PlaceHolderText = "Filter...";
 
         /// <summary>
         /// Gets or sets the binding file.
         /// </summary>
         /// <value>The binding file.</value>
-        private BindingFile BindingFile { get; set; }
+        private BindingFile? BindingFile { get; set; }
 
         /// <summary>
         /// Gets or sets the device map.
         /// </summary>
         /// <value>The device map.</value>
-        private DeviceMap DeviceMap { get; set; }
+        private DeviceMap? DeviceMap { get; set; }
 
         /// <summary>
         /// Gets or sets the key bindings.
         /// </summary>
         /// <value>The key bindings.</value>
-        private ICollectionView KeyBindings { get; set; }
+        private ICollectionView? KeyBindings { get; set; }
 
         /// <summary>
         /// Gets or sets the action mapping.
         /// </summary>
         /// <value>The action mapping.</value>
-        private List<ActionMapping> ActionMappings { get; set; }
+        private List<ActionMapping>? ActionMappings { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainWindow"/> class.
@@ -54,24 +53,64 @@
         {
             InitializeComponent();
 
-            this.ActionMappings = ActionMapping.Open(Path.GetFullPath(@".\ActionMappings.json"));
-
-            var deviceMappingFiles = Directory.GetFiles(@".\DeviceMappings");
-
-            foreach(var deviceMappingFile in deviceMappingFiles)
+            try
             {
+                var actionMappingsPath = Path.GetFullPath(@".\ActionMappings.json");
+                if (File.Exists(actionMappingsPath))
+                {
+                    ActionMappings = ActionMapping.Open(actionMappingsPath);
+                }
+                else
+                {
+                    MessageBox.Show($"ActionMappings.json file not found at: {actionMappingsPath}",
+                        "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    ActionMappings = new List<ActionMapping>();
+                }
 
-                var deviceMapping = DeviceMap.Open(deviceMappingFile);
+                var deviceMappingsPath = @".\DeviceMappings";
+                if (Directory.Exists(deviceMappingsPath))
+                {
+                    var deviceMappingFiles = Directory.GetFiles(deviceMappingsPath, "*.json");
 
-                var menuItem = new MenuItem();
-                menuItem.Header = deviceMapping.Name;
-                menuItem.DataContext = deviceMapping;
-                menuItem.Click += this.DeviceMapSelected;
-                menuItem.IsCheckable = true;
+                    foreach (var deviceMappingFile in deviceMappingFiles)
+                    {
+                        try
+                        {
+                            var deviceMapping = DeviceMap.Open(deviceMappingFile);
+                            var menuItem = new MenuItem
+                            {
+                                Header = deviceMapping.Name,
+                                DataContext = deviceMapping,
+                                IsCheckable = true
+                            };
+                            menuItem.Click += DeviceMapSelected;
 
-                this.DeviceMappingMenu.Items.Add(menuItem);
+                            DeviceMappingMenu.Items.Add(menuItem);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Error loading device mapping file {deviceMappingFile}: {ex.Message}",
+                                "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show($"DeviceMappings directory not found: {Path.GetFullPath(deviceMappingsPath)}",
+                        "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+
+                if (DeviceMappingMenu.Items.Count > 0)
+                {
+                    var selectedIndex = Math.Max(0, Math.Min(ApplicationSettings.Default.DeviceMapSelection, DeviceMappingMenu.Items.Count - 1));
+                    SelectActiveDeviceMapping(selectedIndex);
+                }
             }
-            this.SelectActiveDeviceMapping(ApplicationSettings.Default.DeviceMapSelection);
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error during initialization: {ex.Message}",
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         /// <summary>
@@ -81,8 +120,11 @@
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void DeviceMapSelected(object sender, RoutedEventArgs e)
         {
-            var selectedIndex = this.DeviceMappingMenu.Items.IndexOf(sender);
-            this.SelectActiveDeviceMapping(selectedIndex);
+            var selectedIndex = DeviceMappingMenu.Items.IndexOf(sender);
+            if (selectedIndex >= 0)
+            {
+                SelectActiveDeviceMapping(selectedIndex);
+            }
         }
 
         /// <summary>
@@ -91,22 +133,35 @@
         /// <param name="index">The index.</param>
         private void SelectActiveDeviceMapping(int index)
         {
-            var menuItem = (MenuItem)this.DeviceMappingMenu.Items[index];
-            this.DeviceMap = (DeviceMap)menuItem.DataContext;
-            foreach(var item in this.DeviceMappingMenu.Items)
-            {
-                ((MenuItem)item).IsChecked = false;
-            }
+            if (index < 0 || index >= DeviceMappingMenu.Items.Count)
+                return;
 
-            menuItem.IsChecked = true;
-            if(index != ApplicationSettings.Default.DeviceMapSelection)
+            try
             {
-                ApplicationSettings.Default.DeviceMapSelection = index;
-                ApplicationSettings.Default.Save();
-            }
-            DeviceFileStatusBar.Content = $"Device Mapping: {menuItem.Header}";
-            this.ProcessBindingFile();
+                var menuItem = (MenuItem)DeviceMappingMenu.Items[index];
+                DeviceMap = (DeviceMap?)menuItem.DataContext;
 
+                foreach (MenuItem item in DeviceMappingMenu.Items.OfType<MenuItem>())
+                {
+                    item.IsChecked = false;
+                }
+
+                menuItem.IsChecked = true;
+
+                if (index != ApplicationSettings.Default.DeviceMapSelection)
+                {
+                    ApplicationSettings.Default.DeviceMapSelection = index;
+                    ApplicationSettings.Default.Save();
+                }
+
+                DeviceFileStatusBar.Content = $"Device Mapping: {menuItem.Header}";
+                ProcessBindingFile();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error selecting device mapping: {ex.Message}",
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         /// <summary>
@@ -114,7 +169,7 @@
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
-        private void FileExitMenuItemClick(object sender, RoutedEventArgs e) => this.Close();
+        private void FileExitMenuItemClick(object sender, RoutedEventArgs e) => Close();
 
         /// <summary>
         /// Files the open bindings menu item click.
@@ -123,14 +178,25 @@
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void FileOpenBindingsMenuItemClick(object sender, RoutedEventArgs e)
         {
-            var dialog = new Microsoft.Win32.OpenFileDialog();
-            dialog.DefaultExt = ".binds";
-            dialog.InitialDirectory = Environment.ExpandEnvironmentVariables(@"%localappdata%\Frontier Developments\Elite Dangerous\Options\Bindings");
-            dialog.Filter = "Bindings (*.binds)|*.binds|All files (*.*)|*.*";
-            if (dialog.ShowDialog() == true)
+            try
             {
-                this.BindingFile = BindingFile.Open(dialog.FileName);
-                this.ProcessBindingFile();
+                var dialog = new Microsoft.Win32.OpenFileDialog
+                {
+                    DefaultExt = ".binds",
+                    InitialDirectory = Environment.ExpandEnvironmentVariables(@"%localappdata%\Frontier Developments\Elite Dangerous\Options\Bindings"),
+                    Filter = "Bindings (*.binds)|*.binds|All files (*.*)|*.*"
+                };
+
+                if (dialog.ShowDialog() == true && !string.IsNullOrEmpty(dialog.FileName))
+                {
+                    BindingFile = BindingFile.Open(dialog.FileName);
+                    ProcessBindingFile();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening bindings file: {ex.Message}",
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -139,20 +205,34 @@
         /// </summary>
         private void ProcessBindingFile()
         {
-            if (this.BindingFile == null)
+            if (BindingFile == null || DeviceMap == null || ActionMappings == null)
             {
                 return;
             }
 
-            var justBindingGroups = this.BindingFile.Bindings.Where(binding => binding is EdBindings.Model.BindingsRaw.Bindings.BindingGroup).ToList();
-            var dataSource = justBindingGroups.Select(group => KeyBindingView.MakeKeyBindingView((EdBindings.Model.BindingsRaw.Bindings.BindingGroup)group, this.DeviceMap, this.ActionMappings)).ToList();
-            var filterable = new CollectionViewSource() { Source = new ObservableCollection<KeyBindingView>(dataSource) };
-            this.KeyBindings = filterable.View;
+            try
+            {
+                var justBindingGroups = BindingFile.Bindings
+                    .OfType<EdBindings.Model.BindingsRaw.Bindings.BindingGroup>()
+                    .ToList();
 
-            this.KeyBindingDataGrid.ItemsSource = this.KeyBindings;
-            this.BindingFileStatusBar.Content = Path.GetFileName(this.BindingFile.FileName);
-            this.KeyboardLayoutStatusBar.Content = this.BindingFile.KeyboardLayout;
-            this.txtFilter.Text = placeHolderText;
+                var dataSource = justBindingGroups
+                    .Select(group => KeyBindingView.MakeKeyBindingView(group, DeviceMap, ActionMappings))
+                    .ToList();
+
+                var filterable = new CollectionViewSource { Source = new ObservableCollection<KeyBindingView>(dataSource) };
+                KeyBindings = filterable.View;
+
+                KeyBindingDataGrid.ItemsSource = KeyBindings;
+                BindingFileStatusBar.Content = Path.GetFileName(BindingFile.FileName);
+                KeyboardLayoutStatusBar.Content = BindingFile.KeyboardLayout;
+                txtFilter.Text = PlaceHolderText;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error processing binding file: {ex.Message}",
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         /// <summary>
@@ -162,23 +242,26 @@
         /// <param name="e">The <see cref="System.Windows.Input.KeyEventArgs"/> instance containing the event data.</param>
         private void TxtFilterKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            var p = new Predicate<object>(item =>
-            {
-                var binding = (KeyBindingView)item;
-                return binding.Action.Contains(this.txtFilter.Text, StringComparison.InvariantCultureIgnoreCase) 
-                || binding.PrimaryKey.Contains(this.txtFilter.Text, StringComparison.InvariantCultureIgnoreCase)
-                || (binding.SecondaryKey?.Contains(this.txtFilter.Text, StringComparison.InvariantCultureIgnoreCase) ?? false)
-                || binding.Area.Contains(this.txtFilter.Text, StringComparison.InvariantCultureIgnoreCase)
-                || binding.Category.Contains(this.txtFilter.Text, StringComparison.InvariantCultureIgnoreCase);
-            });
+            if (KeyBindings == null) return;
 
-            if(string.IsNullOrWhiteSpace(this.txtFilter.Text))
+            var filterText = txtFilter.Text ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(filterText) || filterText == PlaceHolderText)
             {
-                this.KeyBindings.Filter = null;
+                KeyBindings.Filter = null;
             }
             else
             {
-                this.KeyBindings.Filter = p;
+                KeyBindings.Filter = item =>
+                {
+                    if (item is not KeyBindingView binding) return false;
+
+                    return binding.Action?.Contains(filterText, StringComparison.InvariantCultureIgnoreCase) == true
+                        || binding.PrimaryKey?.Contains(filterText, StringComparison.InvariantCultureIgnoreCase) == true
+                        || binding.SecondaryKey?.Contains(filterText, StringComparison.InvariantCultureIgnoreCase) == true
+                        || binding.Area?.Contains(filterText, StringComparison.InvariantCultureIgnoreCase) == true
+                        || binding.Category?.Contains(filterText, StringComparison.InvariantCultureIgnoreCase) == true;
+                };
             }
         }
 
@@ -189,11 +272,10 @@
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void TxtFilterGotFocus(object sender, RoutedEventArgs e)
         {
-            if (this.txtFilter.Text == placeHolderText)
+            if (txtFilter.Text == PlaceHolderText)
             {
-                this.txtFilter.Text = string.Empty;
+                txtFilter.Text = string.Empty;
             }
-
         }
 
         /// <summary>
@@ -203,9 +285,9 @@
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void TxtFilterLostFocus(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(this.txtFilter.Text))
+            if (string.IsNullOrWhiteSpace(txtFilter.Text))
             {
-                this.txtFilter.Text = placeHolderText;
+                txtFilter.Text = PlaceHolderText;
             }
         }
 
@@ -216,9 +298,19 @@
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void MenuItemClick(object sender, RoutedEventArgs e)
         {
-            var dialog = new AboutWindow();
-            dialog.Owner = this;
-            dialog.ShowDialog();
+            try
+            {
+                var dialog = new AboutWindow
+                {
+                    Owner = this
+                };
+                dialog.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening About dialog: {ex.Message}",
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }

@@ -1,9 +1,8 @@
 ﻿namespace EdBindings.Model
 {
     using EdBindings.Model.BindingsRaw.Bindings;
-
     using Newtonsoft.Json;
-
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -17,27 +16,29 @@
         /// Gets or sets the name.
         /// </summary>
         /// <value>The name.</value>
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the controls.
         /// </summary>
         /// <value>The controls.</value>
-        public List<DeviceControlMap> Controls { get; set; }
+        public List<DeviceControlMap> Controls { get; set; } = new();
 
         /// <summary>
         /// Finds the control map.
         /// </summary>
         /// <param name="binding">The binding.</param>
         /// <returns>DeviceControlMap.</returns>
-        public DeviceControlMap FindControlMap(BindingDevice binding)
+        public DeviceControlMap? FindControlMap(BindingDevice? binding)
         {
-            if (binding == null)
+            if (binding?.Device == null || binding.Key == null)
             {
                 return null;
             }
 
-            return this.Controls.FirstOrDefault(c => c.DeviceId.ToUpperInvariant() == binding.Device.ToUpperInvariant() && c.ControlValue.ToUpperInvariant() == binding.Key.ToUpperInvariant());
+            return Controls.FirstOrDefault(c =>
+                string.Equals(c.DeviceId, binding.Device, StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(c.ControlValue, binding.Key, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -47,7 +48,8 @@
         /// <returns>DeviceMap.</returns>
         public static DeviceMap Open(string path)
         {
-            return JsonConvert.DeserializeObject<DeviceMap>(File.ReadAllText(path));
+            var json = File.ReadAllText(path);
+            return JsonConvert.DeserializeObject<DeviceMap>(json) ?? new DeviceMap();
         }
     }
 }
