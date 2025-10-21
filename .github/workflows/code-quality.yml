@@ -1,0 +1,460 @@
+name: 📊 Code Quality Analysis
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  # Code metrics and analysis
+  code-metrics:
+    name: 📈 Code Metrics Analysis
+    runs-on: windows-latest
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: 🔧 Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: 📦 Restore dependencies
+      run: dotnet restore
+
+    - name: 🔧 Install analysis tools
+      run: |
+        # Install code metrics tools
+        dotnet tool install --global dotnet-counters
+        dotnet tool install --global dotnet-reportgenerator-globaltool
+        
+        # Install additional analysis tools
+        if (-not (Get-Module -ListAvailable -Name PSScriptAnalyzer)) {
+          Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
+        }
+
+    - name: 🏗️ Build solution for analysis
+      run: |
+        dotnet build --configuration Release --no-restore --verbosity normal `
+          /p:TreatWarningsAsErrors=true `
+          /p:WarningsAsErrors="" `
+          /p:WarningsNotAsErrors="CS1591;CS0618"
+
+    - name: 📊 Calculate code metrics
+      run: |
+        Write-Host "::group::Code Metrics Calculation"
+        
+        # Count lines of code
+        $sourceFiles = Get-ChildItem -Recurse -Include "*.cs" -Exclude "*AssemblyInfo.cs", "*GlobalAssemblyInfo.cs", "*.Designer.cs", "*.g.cs"
+        $totalLines = 0
+        $totalCodeLines = 0
+        $totalFiles = $sourceFiles.Count
+        
+        foreach ($file in $sourceFiles) {
+          $content = Get-Content $file.FullName
+          $totalLines += $content.Count
+          
+          # Count non-empty, non-comment lines
+          $codeLines = $content | Where-Object { 
+            $_.Trim() -ne "" -and 
+            -not $_.Trim().StartsWith("//") -and 
+            -not $_.Trim().StartsWith("/*") -and 
+            -not $_.Trim().StartsWith("*") -and
+            -not $_.Trim().StartsWith("using ")
+          }
+          $totalCodeLines += $codeLines.Count
+        }
+        
+        Write-Host "📁 Total source files: $totalFiles"
+        Write-Host "📏 Total lines: $totalLines"
+        Write-Host "💻 Code lines: $totalCodeLines"
+        Write-Host "📊 Code density: $([math]::Round(($totalCodeLines / $totalLines) * 100, 1))%"
+        
+        # Calculate complexity indicators
+        $classCount = (Select-String -Path $sourceFiles -Pattern "^\s*(public|internal|private)?\s*(static)?\s*class\s+" | Measure-Object).Count
+        $methodCount = (Select-String -Path $sourceFiles -Pattern "^\s*(public|internal|private|protected)?\s*(static)?\s*\w+\s+\w+\s*\(" | Measure-Object).Count
+        
+        Write-Host "🏗️ Classes: $classCount"
+        Write-Host "⚙️ Methods: $methodCount"
+        Write-Host "📐 Avg methods per class: $([math]::Round($methodCount / $classCount, 1))"
+        
+        # Export metrics for reporting
+        $metrics = @{
+          TotalFiles = $totalFiles
+          TotalLines = $totalLines
+          CodeLines = $totalCodeLines
+          CodeDensity = [math]::Round(($totalCodeLines / $totalLines) * 100, 1)
+          Classes = $classCount
+          Methods = $methodCount
+          AvgMethodsPerClass = [math]::Round($methodCount / $classCount, 1)
+        }
+        
+        $metrics | ConvertTo-Json | Out-File -FilePath "code-metrics.json"
+        
+        Write-Host "::endgroup::"
+
+    - name: 🔍 Code complexity analysis
+      run: |
+        Write-Host "::group::Complexity Analysis"
+        
+        # Analyze method complexity patterns
+        $longMethods = Select-String -Path "src/**/*.cs" -Pattern "^\s*(public|private|protected|internal)" | ForEach-Object {
+          $file = $_.Filename
+          $lineNum = $_.LineNumber
+          $content = Get-Content $_.Filename
+          
+          # Count lines in method (simple heuristic)
+          $methodLines = 0
+          $braceCount = 0
+          $inMethod = $false
+          
+          for ($i = $lineNum - 1; $i -lt $content.Count; $i++) {
+            $line = $content[$i]
+            if ($line -match '\{') { 
+              $braceCount++
+              $inMethod = $true
+            }
+            if ($inMethod) { $methodLines++ }
+            if ($line -match '\}') { 
+              $braceCount--
+              if ($braceCount -eq 0) { break }
+            }
+          }
+          
+          if ($methodLines -gt 50) {
+            Write-Host "::warning::Long method detected in $file at line $lineNum ($methodLines lines)"
+          }
+        }
+        
+        # Check for deep nesting
+        $deepNesting = Select-String -Path "src/**/*.cs" -Pattern "^\s{20,}" -AllMatches
+        if ($deepNesting.Count -gt 0) {
+          Write-Host "::warning::Deep nesting detected in $($deepNesting.Count) locations. Consider refactoring."
+        }
+        
+        Write-Host "::endgroup::"
+
+    - name: 📋 Maintainability analysis
+      run: |
+        Write-Host "::group::Maintainability Analysis"
+        
+        # Check for code smells
+        $codeSmells = @()
+        
+        # Large files
+        $largeFiles = Get-ChildItem -Recurse -Include "*.cs" | Where-Object { 
+          (Get-Content $_.FullName).Count -gt 500 
+        }
+        
+        foreach ($file in $largeFiles) {
+          $lineCount = (Get-Content $file.FullName).Count
+          Write-Host "::notice::Large file: $($file.Name) ($lineCount lines)"
+          $codeSmells += "Large file: $($file.Name)"
+        }
+        
+        # Duplicate code patterns (simple check)
+        $duplicatePatterns = Select-String -Path "src/**/*.cs" -Pattern "^\s*(if|for|while|switch)\s*\(" | 
+          Group-Object Pattern | Where-Object Count -gt 10
+        
+        foreach ($pattern in $duplicatePatterns) {
+          Write-Host "::notice::Potential code duplication: '$($pattern.Name)' appears $($pattern.Count) times"
+        }
+        
+        # Export maintainability report
+        $maintainability = @{
+          LargeFiles = $largeFiles.Count
+          PotentialDuplication = $duplicatePatterns.Count
+          CodeSmells = $codeSmells
+        }
+        
+        $maintainability | ConvertTo-Json | Out-File -FilePath "maintainability-report.json"
+        
+        Write-Host "::endgroup::"
+
+    - name: 📤 Upload metrics reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: code-metrics
+        path: |
+          code-metrics.json
+          maintainability-report.json
+        retention-days: 30
+
+  # Static code analysis with multiple tools
+  static-analysis:
+    name: 🔬 Static Code Analysis
+    runs-on: windows-latest
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: 🔧 Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: 📦 Restore dependencies
+      run: dotnet restore
+
+    - name: 🔧 Install analysis tools
+      run: |
+        # Install StyleCop analyzers
+        dotnet add package StyleCop.Analyzers --version 1.2.0-beta.556
+        
+        # Install Microsoft Code Analysis
+        dotnet add package Microsoft.CodeAnalysis.Analyzers --version 3.3.4
+        dotnet add package Microsoft.CodeAnalysis.NetAnalyzers --version 8.0.0
+
+    - name: 🏗️ Build with enhanced analysis
+      run: |
+        Write-Host "::group::Static Analysis Build"
+        dotnet build --configuration Release --no-restore --verbosity normal `
+          /p:TreatWarningsAsErrors=false `
+          /p:WarningsAsErrors="" `
+          /p:RunAnalyzersDuringBuild=true `
+          /p:RunCodeAnalysis=true `
+          /p:CodeAnalysisRuleSet="analyzers.ruleset"
+        Write-Host "::endgroup::"
+
+    - name: 📊 Generate code analysis report
+      run: |
+        Write-Host "::group::Code Analysis Report"
+        
+        # Run additional analysis
+        dotnet format --verify-no-changes --report format-report.json --include src/
+        
+        # Analyze XAML files
+        $xamlFiles = Get-ChildItem -Recurse -Include "*.xaml"
+        Write-Host "📱 XAML files found: $($xamlFiles.Count)"
+        
+        foreach ($xaml in $xamlFiles) {
+          $content = Get-Content $xaml.FullName -Raw
+          
+          # Check for performance issues in XAML
+          if ($content -match 'x:Name=".*".*x:Name=".*"') {
+            Write-Host "::warning::Multiple x:Name attributes in $($xaml.Name)"
+          }
+          
+          if ($content -match 'Binding.*UpdateSourceTrigger=PropertyChanged') {
+            Write-Host "::notice::Frequent binding updates in $($xaml.Name) - consider performance impact"
+          }
+        }
+        
+        Write-Host "::endgroup::"
+
+    - name: 🧪 Code coverage quality gate
+      run: |
+        Write-Host "::group::Coverage Quality Gate"
+        
+        # Run tests with coverage
+        dotnet test --configuration Release --no-build --verbosity normal `
+          --collect:"XPlat Code Coverage" `
+          --results-directory ./coverage `
+          -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+        
+        # Generate coverage report
+        reportgenerator `
+          -reports:"coverage/**/coverage.opencover.xml" `
+          -targetdir:"coverage/report" `
+          -reporttypes:"JsonSummary;Badges" `
+          -title:"EdBindings Coverage Report"
+        
+        # Parse coverage data
+        if (Test-Path "coverage/report/Summary.json") {
+          $coverageData = Get-Content "coverage/report/Summary.json" | ConvertFrom-Json
+          $lineCoverage = [math]::Round($coverageData.summary.linecoverage, 1)
+          $branchCoverage = [math]::Round($coverageData.summary.branchcoverage, 1)
+          
+          Write-Host "📊 Line Coverage: $lineCoverage%"
+          Write-Host "🌿 Branch Coverage: $branchCoverage%"
+          
+          # Quality gates
+          if ($lineCoverage -lt 70) {
+            Write-Host "::error::Line coverage ($lineCoverage%) is below minimum threshold (70%)"
+            exit 1
+          } elseif ($lineCoverage -lt 85) {
+            Write-Host "::warning::Line coverage ($lineCoverage%) is below recommended threshold (85%)"
+          } else {
+            Write-Host "::notice::✅ Excellent line coverage ($lineCoverage%)!"
+          }
+          
+          if ($branchCoverage -lt 60) {
+            Write-Host "::warning::Branch coverage ($branchCoverage%) is below recommended threshold (60%)"
+          }
+        }
+        
+        Write-Host "::endgroup::"
+
+    - name: 📤 Upload analysis reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: static-analysis
+        path: |
+          coverage/report/**/*
+          format-report.json
+        retention-days: 30
+
+  # Documentation quality check
+  documentation-quality:
+    name: 📚 Documentation Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🔍 Analyze documentation coverage
+      run: |
+        echo "::group::Documentation Analysis"
+        
+        # Count XML documentation
+        cs_files=$(find src/ -name "*.cs" -type f | wc -l)
+        documented_methods=$(grep -r "/// <summary>" src/ | wc -l)
+        
+        echo "📄 C# files: $cs_files"
+        echo "📝 Documented methods: $documented_methods"
+        
+        if [ $cs_files -gt 0 ]; then
+          doc_ratio=$(echo "scale=1; $documented_methods * 100 / $cs_files" | bc -l)
+          echo "📊 Documentation ratio: ${doc_ratio}%"
+          
+          if [ $(echo "$doc_ratio < 50" | bc -l) -eq 1 ]; then
+            echo "::warning::Low documentation coverage (${doc_ratio}%). Consider adding XML documentation."
+          elif [ $(echo "$doc_ratio >= 80" | bc -l) -eq 1 ]; then
+            echo "::notice::✅ Excellent documentation coverage (${doc_ratio}%)!"
+          fi
+        fi
+        
+        # Check README quality
+        if [ -f "README.md" ]; then
+          readme_lines=$(wc -l < README.md)
+          echo "📖 README.md lines: $readme_lines"
+          
+          if [ $readme_lines -lt 20 ]; then
+            echo "::warning::README.md is quite short. Consider adding more details."
+          fi
+          
+          # Check for essential sections
+          if ! grep -qi "installation\|setup" README.md; then
+            echo "::warning::README.md missing installation/setup section"
+          fi
+          
+          if ! grep -qi "usage\|how to" README.md; then
+            echo "::warning::README.md missing usage section"
+          fi
+        else
+          echo "::error::README.md is missing!"
+        fi
+        
+        echo "::endgroup::"
+
+    - name: 🔤 Spell check documentation
+      uses: crate-ci/typos@master
+      with:
+        files: '**/*.md **/*.txt'
+        config: |
+          [default.extend-words]
+          EdBindings = "EdBindings"
+          HOTAS = "HOTAS"
+          keybinding = "keybinding"
+          keybindings = "keybindings"
+          gameplay = "gameplay"
+
+  # Quality summary report
+  quality-summary:
+    name: 📋 Quality Summary Report
+    runs-on: ubuntu-latest
+    needs: [code-metrics, static-analysis, documentation-quality]
+    if: always()
+    
+    permissions:
+      contents: read
+      pull-requests: write
+    
+    steps:
+    - name: 📊 Generate quality report
+      id: quality-report
+      run: |
+        echo "::group::📊 Code Quality Summary"
+        
+        metrics_result="${{ needs.code-metrics.result }}"
+        analysis_result="${{ needs.static-analysis.result }}"
+        docs_result="${{ needs.documentation-quality.result }}"
+        
+        echo "| Quality Check | Status | Details |"
+        echo "|---------------|--------|---------|"
+        echo "| Code Metrics | $metrics_result | Lines of code, complexity analysis |"
+        echo "| Static Analysis | $analysis_result | Code style, potential issues |"
+        echo "| Documentation | $docs_result | README, XML docs, spell check |"
+        echo ""
+        
+        # Calculate overall quality score
+        score=0
+        total_checks=3
+        
+        if [ "$metrics_result" = "success" ]; then score=$((score + 1)); fi
+        if [ "$analysis_result" = "success" ]; then score=$((score + 1)); fi
+        if [ "$docs_result" = "success" ]; then score=$((score + 1)); fi
+        
+        quality_percentage=$((score * 100 / total_checks))
+        
+        echo "## 🎯 Overall Quality Score: $quality_percentage%"
+        echo ""
+        
+        if [ $quality_percentage -ge 90 ]; then
+          echo "🏆 **Excellent!** Your code meets high quality standards."
+          echo "quality_badge=excellent" >> $GITHUB_OUTPUT
+        elif [ $quality_percentage -ge 70 ]; then
+          echo "✅ **Good!** Code quality is acceptable with room for improvement."
+          echo "quality_badge=good" >> $GITHUB_OUTPUT
+        elif [ $quality_percentage -ge 50 ]; then
+          echo "⚠️ **Needs Improvement** Several quality issues need attention."
+          echo "quality_badge=needs-improvement" >> $GITHUB_OUTPUT
+        else
+          echo "❌ **Poor Quality** Significant improvements required."
+          echo "quality_badge=poor" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+        
+        echo "::endgroup::"
+
+    - name: 💬 Comment on PR
+      if: github.event_name == 'pull_request'
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        header: quality-report
+        message: |
+          ## 📊 Code Quality Report
+          
+          | Check | Status |
+          |-------|--------|
+          | 📈 Code Metrics | ${{ needs.code-metrics.result }} |
+          | 🔬 Static Analysis | ${{ needs.static-analysis.result }} |
+          | 📚 Documentation | ${{ needs.documentation-quality.result }} |
+          
+          **Quality Score:** ${{ steps.quality-report.outputs.quality_badge }}
+          
+          View detailed reports in the Actions tab for more information.
+          
+          ---
+          *This comment is automatically updated on each push.*

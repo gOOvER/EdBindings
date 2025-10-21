@@ -1,0 +1,20 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/gOOvER/EdBindings/discussions
+    about: Ask questions, share ideas, and discuss the project with the community
+  - name: 📖 Documentation
+    url: https://github.com/gOOvER/EdBindings/wiki
+    about: Check the project wiki for setup guides, troubleshooting, and FAQ
+  - name: 🔧 Troubleshooting Guide
+    url: https://github.com/gOOvER/EdBindings/blob/main/.github/CI-CD-PIPELINE.md#-troubleshooting
+    about: Common issues and their solutions for development and usage
+  - name: 🎮 Elite Dangerous Community
+    url: https://www.reddit.com/r/EliteDangerous/
+    about: General Elite Dangerous discussions and community support
+  - name: 🛠️ VoiceAttack Integration
+    url: https://voiceattack.com/
+    about: For VoiceAttack-specific questions and integration support
+  - name: 📧 Direct Contact
+    url: mailto:support@edbindings.example.com
+    about: For sensitive issues or direct developer contact (replace with actual email)

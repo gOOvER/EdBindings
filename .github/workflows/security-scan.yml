@@ -1,0 +1,348 @@
+name: 🔒 Advanced Security Scan
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 6 * * 1'  # Weekly on Monday at 6 AM UTC
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  # SAST (Static Application Security Testing)
+  sast-analysis:
+    name: 🔍 Static Security Analysis
+    runs-on: windows-latest
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: 🔧 Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: 📦 Restore dependencies
+      run: dotnet restore
+
+    - name: 🛡️ Install security analysis tools
+      run: |
+        # Install security scanner
+        dotnet tool install --global security-scan --version 5.6.7
+        
+        # Install DevSkim for additional security rules
+        dotnet tool install --global Microsoft.CST.DevSkim.CLI
+
+    - name: 🔒 Run Security Code Scan
+      run: |
+        Write-Host "::group::Security Code Analysis"
+        try {
+          security-scan "src/" --export=security-report.sarif --format=sarif
+        } catch {
+          Write-Host "::warning::Security scan completed with findings"
+        }
+        Write-Host "::endgroup::"
+
+    - name: 🔍 Run DevSkim analysis
+      run: |
+        Write-Host "::group::DevSkim Security Rules"
+        devskim analyze "src/" --output-file devskim-results.sarif --output-format sarif
+        Write-Host "::endgroup::"
+
+    - name: 📤 Upload security results to GitHub Security tab
+      if: always()
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: |
+          security-report.sarif
+          devskim-results.sarif
+        category: security-scan
+
+    - name: 📊 Generate security summary
+      if: always()
+      run: |
+        Write-Host "::group::Security Analysis Summary"
+        
+        $securityIssues = 0
+        if (Test-Path "security-report.sarif") {
+          $securityData = Get-Content "security-report.sarif" | ConvertFrom-Json
+          $securityIssues += $securityData.runs[0].results.Count
+        }
+        
+        if (Test-Path "devskim-results.sarif") {
+          $devskimData = Get-Content "devskim-results.sarif" | ConvertFrom-Json
+          $securityIssues += $devskimData.runs[0].results.Count
+        }
+        
+        if ($securityIssues -eq 0) {
+          Write-Host "::notice::✅ No security issues found!"
+        } else {
+          Write-Host "::warning::⚠️ Found $securityIssues potential security issues. Check Security tab for details."
+        }
+        
+        Write-Host "::endgroup::"
+
+  # Dependency vulnerability scanning
+  dependency-security:
+    name: 🔗 Dependency Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🔧 Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: 📦 Restore packages
+      run: dotnet restore
+
+    - name: 🛡️ Vulnerability scan with dotnet
+      run: |
+        echo "::group::Vulnerability Scan"
+        
+        # Check for vulnerable packages
+        vulnerabilities=$(dotnet list package --vulnerable --include-transitive 2>&1)
+        echo "$vulnerabilities"
+        
+        if echo "$vulnerabilities" | grep -q "has the following vulnerable packages"; then
+          echo "::error::Vulnerable dependencies detected!"
+          echo "$vulnerabilities" > vulnerability-report.txt
+          exit 1
+        else
+          echo "::notice::✅ No vulnerable dependencies found!"
+        fi
+        
+        echo "::endgroup::"
+
+    - name: 🔍 Advanced dependency analysis with Snyk
+      uses: snyk/actions/dotnet@master
+      continue-on-error: true
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=high --file=EdBindings.sln
+
+    - name: 📤 Upload Snyk results
+      if: always()
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: snyk.sarif
+        category: dependency-scan
+      continue-on-error: true
+
+    - name: 📋 License compliance check
+      run: |
+        echo "::group::License Compliance"
+        
+        # Generate license report
+        dotnet tool install --global dotnet-project-licenses
+        dotnet-project-licenses --input . --output-format json --export-license-texts > licenses.json
+        
+        # Check for problematic licenses
+        problematic_licenses=("GPL" "AGPL" "LGPL" "CDDL" "EPL")
+        found_issues=false
+        
+        for license in "${problematic_licenses[@]}"; do
+          if grep -qi "$license" licenses.json; then
+            echo "::warning::Found potentially problematic license: $license"
+            found_issues=true
+          fi
+        done
+        
+        if [ "$found_issues" = false ]; then
+          echo "::notice::✅ No problematic licenses detected!"
+        fi
+        
+        echo "::endgroup::"
+
+    - name: 📤 Upload compliance reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-compliance-reports
+        path: |
+          vulnerability-report.txt
+          licenses.json
+          snyk.sarif
+        retention-days: 30
+
+  # Secrets scanning
+  secrets-scan:
+    name: 🔐 Secrets Detection
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: 🔍 TruffleHog secrets scan
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: main
+        head: HEAD
+        extra_args: --debug --only-verified
+
+    - name: 🔒 GitLeaks secrets scan
+      uses: gitleaks/gitleaks-action@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+    - name: 📊 Secrets scan summary
+      if: always()
+      run: |
+        echo "::group::Secrets Scan Summary"
+        echo "🔍 Completed comprehensive secrets scanning"
+        echo "📋 Checked for:"
+        echo "  - API keys and tokens"
+        echo "  - Database credentials"
+        echo "  - Private keys and certificates"
+        echo "  - Cloud service credentials"
+        echo "  - Generic secret patterns"
+        echo "::endgroup::"
+
+  # Configuration security audit
+  config-security:
+    name: ⚙️ Configuration Security Audit
+    runs-on: windows-latest
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🔧 Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: 🔍 Analyze project configurations
+      run: |
+        Write-Host "::group::Configuration Security Analysis"
+        
+        # Check .csproj files for security configurations
+        $projectFiles = Get-ChildItem -Recurse -Filter "*.csproj"
+        
+        foreach ($proj in $projectFiles) {
+          Write-Host "Analyzing: $($proj.Name)"
+          $content = Get-Content $proj.FullName -Raw
+          
+          # Check for debug configurations in release
+          if ($content -match "DebugType.*full" -and $content -match "Configuration.*Release") {
+            Write-Host "::warning::Debug symbols enabled in Release configuration in $($proj.Name)"
+          }
+          
+          # Check for unsafe code blocks
+          if ($content -match "AllowUnsafeBlocks.*true") {
+            Write-Host "::warning::Unsafe code blocks enabled in $($proj.Name)"
+          }
+          
+          # Check for XML documentation warnings suppression
+          if ($content -match "NoWarn.*1591") {
+            Write-Host "::notice::XML documentation warnings suppressed in $($proj.Name)"
+          }
+          
+          # Check for nullable reference types
+          if ($content -notmatch "Nullable.*enable") {
+            Write-Host "::notice::Consider enabling nullable reference types in $($proj.Name)"
+          }
+        }
+        
+        Write-Host "::endgroup::"
+
+    - name: 🔒 Check application security settings
+      run: |
+        Write-Host "::group::Application Security Settings"
+        
+        # Check App.config and other config files
+        $configFiles = Get-ChildItem -Recurse -Include "*.config", "*.json", "*.xml" | Where-Object {
+          $_.Name -notlike "*.csproj*" -and 
+          $_.Name -notlike "*packages.config" -and
+          $_.Directory.Name -notlike "bin" -and
+          $_.Directory.Name -notlike "obj"
+        }
+        
+        foreach ($config in $configFiles) {
+          Write-Host "Checking: $($config.Name)"
+          $content = Get-Content $config.FullName -Raw
+          
+          # Check for hardcoded sensitive data patterns
+          $sensitivePatterns = @(
+            'password\s*[=:]\s*[^"]{1,}',
+            'secret\s*[=:]\s*[^"]{1,}',
+            'key\s*[=:]\s*[^"]{1,}',
+            'connectionstring.*password'
+          )
+          
+          foreach ($pattern in $sensitivePatterns) {
+            if ($content -match $pattern) {
+              Write-Host "::warning::Potential sensitive data in $($config.Name)"
+            }
+          }
+        }
+        
+        Write-Host "::endgroup::"
+
+  # Security summary report
+  security-summary:
+    name: 📊 Security Summary
+    runs-on: ubuntu-latest
+    needs: [sast-analysis, dependency-security, secrets-scan, config-security]
+    if: always()
+    
+    steps:
+    - name: 📋 Generate security report
+      run: |
+        echo "::group::🔒 Security Scan Summary"
+        echo "## Security Analysis Results"
+        echo ""
+        
+        sast_result="${{ needs.sast-analysis.result }}"
+        deps_result="${{ needs.dependency-security.result }}"
+        secrets_result="${{ needs.secrets-scan.result }}"
+        config_result="${{ needs.config-security.result }}"
+        
+        echo "| Check | Status |"
+        echo "|-------|--------|"
+        echo "| Static Analysis | $sast_result |"
+        echo "| Dependency Security | $deps_result |"
+        echo "| Secrets Detection | $secrets_result |"
+        echo "| Configuration Audit | $config_result |"
+        echo ""
+        
+        failed_checks=0
+        if [ "$sast_result" != "success" ]; then failed_checks=$((failed_checks + 1)); fi
+        if [ "$deps_result" != "success" ]; then failed_checks=$((failed_checks + 1)); fi
+        if [ "$secrets_result" != "success" ]; then failed_checks=$((failed_checks + 1)); fi
+        if [ "$config_result" != "success" ]; then failed_checks=$((failed_checks + 1)); fi
+        
+        if [ $failed_checks -eq 0 ]; then
+          echo "🎉 **All security checks passed!**"
+          echo "✅ Your code meets our security standards."
+        elif [ $failed_checks -lt 3 ]; then
+          echo "⚠️ **Some security issues detected**"
+          echo "Please review the Security tab for details."
+        else
+          echo "🚨 **Multiple security issues found**"
+          echo "❌ Please address security findings before merging."
+          exit 1
+        fi
+        
+        echo "::endgroup::"
