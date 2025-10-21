@@ -1,100 +1,52 @@
----
 name: 💬 Feedback & Suggestions
-about: Share your experience and suggestions for improvement
+description: Share your experience and suggestions for improvement
 title: '[FEEDBACK] '
 labels: ['feedback', 'needs-triage']
-assignees: ''
----
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to share your feedback! Your input helps us improve EdBindings.
 
-## 💬 Feedback Type
-**What kind of feedback is this?**
-- [ ] General user experience
-- [ ] UI/UX suggestions
-- [ ] Performance feedback
-- [ ] Documentation feedback
-- [ ] Installation/Setup experience
-- [ ] Feature appreciation
-- [ ] Other: [Describe]
+  - type: dropdown
+    id: feedback-type
+    attributes:
+      label: 💬 Feedback Type
+      description: What kind of feedback are you sharing?
+      options:
+        - General Experience
+        - User Interface/Design
+        - Performance
+        - Feature Suggestion
+        - Documentation
+        - Other
+    validations:
+      required: true
 
-## 🎯 Overall Experience
-**How would you rate your overall experience with EdBindings?**
-- [ ] Excellent - Exceeds expectations
-- [ ] Good - Meets expectations
-- [ ] Average - Adequate but could be better
-- [ ] Poor - Below expectations
-- [ ] Very Poor - Significant issues
+  - type: textarea
+    id: feedback-details
+    attributes:
+      label: 📝 Your Feedback
+      description: Please share your detailed feedback or suggestions.
+      placeholder: I think EdBindings could be improved by...
+    validations:
+      required: true
 
-## ✅ What's Working Well
-**What do you like about EdBindings?**
-Tell us about the features, design, or functionality that you find valuable.
+  - type: dropdown
+    id: experience-level
+    attributes:
+      label: 🎯 Experience Level
+      description: How would you describe your experience with EdBindings?
+      options:
+        - New user (first time using)
+        - Casual user (occasionally)
+        - Regular user (weekly)
+        - Power user (daily)
 
-**Specific Highlights:**
-- User interface design
-- Performance
-- Feature completeness
-- Documentation quality
-- Installation process
-- Device support
-- Elite Dangerous integration
-
-## 🔧 Areas for Improvement
-**What could be better?**
-Share your thoughts on what could be improved or enhanced.
-
-**Specific Areas:**
-- [ ] User interface could be more intuitive
-- [ ] Performance could be faster
-- [ ] More device support needed
-- [ ] Better error messages
-- [ ] More customization options
-- [ ] Improved documentation
-- [ ] Other: [Describe]
-
-## 🎮 Usage Context
-**How do you use EdBindings?**
-- Primary use case: [e.g. Streaming, Personal reference, VoiceAttack integration]
-- Frequency of use: [Daily/Weekly/Monthly/Occasionally]
-- Elite Dangerous play style: [e.g. Combat, Exploration, Trading, Mining]
-- Input setup: [e.g. HOTAS + Pedals, Dual stick, Gamepad, KB+M]
-
-## 💡 Suggestions
-**Specific Improvement Ideas:**
-If you have concrete suggestions for improvements, describe them here.
-
-**Inspiration from Other Tools:**
-Are there other applications or tools that handle similar functionality well?
-
-## 📊 Workflow Integration
-**How does EdBindings fit into your Elite Dangerous workflow?**
-Describe how you currently use the application and how it could better integrate with your gaming setup.
-
-**Integration with Other Tools:**
-- VoiceAttack
-- Streaming software
-- Elite Dangerous tools
-- Voice control software
-- Other binding managers
-
-## 🔮 Future Features
-**What features would make EdBindings even better?**
-Share your wishlist for future functionality.
-
-## 👥 Community
-**How did you discover EdBindings?**
-- [ ] Elite Dangerous community
-- [ ] Reddit
-- [ ] YouTube/Twitch
-- [ ] GitHub search
-- [ ] Friend recommendation
-- [ ] Other: [Describe]
-
-**Would you recommend EdBindings to other Elite Dangerous players?**
-- [ ] Yes, definitely
-- [ ] Yes, with some reservations
-- [ ] Maybe
-- [ ] Probably not
-- [ ] No
-
-## 📝 Additional Thoughts
-**Any other feedback or comments?**
-Share any additional thoughts, experiences, or suggestions you have.
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 📋 Additional Context
+      description: Any other context or information you'd like to share?
+      placeholder: Additional thoughts, comparisons to other tools, etc.
