@@ -1,14 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: 💬 GitHub Discussions
-    url: https://github.com/gOOvER/EdBindings/discussions
-    about: Ask questions, share ideas, and discuss the project with the community
-  - name: 📖 Documentation
-    url: https://github.com/gOOvER/EdBindings/wiki
-    about: Check the project wiki for setup guides, troubleshooting, and FAQ
-  - name: 🔧 Troubleshooting Guide
-    url: https://github.com/gOOvER/EdBindings/blob/main/.github/CI-CD-PIPELINE.md#-troubleshooting
-    about: Common issues and their solutions for development and usage
   - name: 🎮 Elite Dangerous Community
     url: https://www.reddit.com/r/EliteDangerous/
     about: General Elite Dangerous discussions and community support
