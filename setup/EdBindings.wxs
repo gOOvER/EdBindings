@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" 
+           Name="EdBindings" 
+           Language="1033" 
+           Version="!(bind.fileVersion.EdBindings.exe)" 
+           Manufacturer="Elite Dangerous Community"
+           UpgradeCode="12345678-1234-1234-1234-123456789012">
+    
+    <Package InstallerVersion="200" 
+             Compressed="yes" 
+             InstallScope="perMachine" 
+             Description="EdBindings - Elite Dangerous Key Binding Viewer"
+             Comments="Elite Dangerous key binding configuration tool" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Features -->
+    <Feature Id="ProductFeature" Title="EdBindings" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentRef Id="ApplicationShortcuts" />
+    </Feature>
+
+    <!-- Installation directory -->
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="EdBindings" />
+      </Directory>
+      
+      <!-- Start Menu -->
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="EdBindings" />
+      </Directory>
+      
+      <!-- Desktop -->
+      <Directory Id="DesktopFolder" Name="Desktop" />
+    </Directory>
+
+    <!-- Components -->
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <!-- Main executable -->
+      <Component Id="EdBindings.exe" Guid="*">
+        <File Id="EdBindings.exe" 
+              Source="$(var.SourceDir)\EdBindings.exe" 
+              KeyPath="yes" />
+      </Component>
+      
+      <!-- Dependencies -->
+      <Component Id="EdBindings.Model.dll" Guid="*">
+        <File Id="EdBindings.Model.dll" 
+              Source="$(var.SourceDir)\EdBindings.Model.dll" />
+      </Component>
+      
+      <!-- Configuration files -->
+      <Component Id="ActionMappings.json" Guid="*">
+        <File Id="ActionMappings.json" 
+              Source="$(var.SourceDir)\ActionMappings.json" />
+      </Component>
+      
+      <!-- Device mappings directory -->
+      <Component Id="DeviceMappingsFolder" Guid="*">
+        <CreateFolder />
+        <File Id="X56.json" 
+              Source="$(var.SourceDir)\DeviceMappings\X56.json" />
+      </Component>
+    </ComponentGroup>
+
+    <!-- Shortcuts -->
+    <Component Id="ApplicationShortcuts" Directory="ApplicationProgramsFolder" Guid="*">
+      <Shortcut Id="ApplicationStartMenuShortcut"
+                Name="EdBindings"
+                Description="Elite Dangerous Key Binding Viewer" 
+                Target="[#EdBindings.exe]"
+                WorkingDirectory="INSTALLFOLDER" />
+      
+      <Shortcut Id="ApplicationDesktopShortcut"
+                Directory="DesktopFolder"
+                Name="EdBindings"
+                Description="Elite Dangerous Key Binding Viewer"
+                Target="[#EdBindings.exe]"
+                WorkingDirectory="INSTALLFOLDER" />
+                
+      <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall" />
+      <RegistryValue Root="HKCU" 
+                     Key="Software\EdBindings" 
+                     Name="installed" 
+                     Type="integer" 
+                     Value="1" 
+                     KeyPath="yes" />
+    </Component>
+
+    <!-- UI -->
+    <UIRef Id="WixUI_InstallDir" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    
+    <!-- License -->
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+    
+    <!-- Branding -->
+    <Property Id="ARPPRODUCTICON" Value="EdBindings.exe" />
+    <Property Id="ARPHELPLINK" Value="https://github.com/gOOvER/EdBindings" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/gOOvER/EdBindings" />
+  </Product>
+</Wix>

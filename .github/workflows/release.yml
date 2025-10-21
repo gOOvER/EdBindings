@@ -61,12 +61,67 @@ jobs:
     - name: Publish Windows x86
       run: dotnet publish src/EdBindings/EdBindings.csproj --configuration Release --runtime win-x86 --self-contained true --output ./publish/win-x86
 
-    - name: Build MSI Installer (x64)
+    - name: 🔨 Build MSI Installer (Automated)
       run: |
-        # Note: This requires Visual Studio Build Tools with VDPROJ support
-        # For now, we'll create a note about manual MSI build requirement
-        echo "MSI build requires Visual Studio with VDPROJ extension" > ./publish/MSI_BUILD_NOTES.txt
-        echo "Build the setup project manually in Visual Studio after release" >> ./publish/MSI_BUILD_NOTES.txt
+        # Install WiX Toolset
+        Write-Host "🔽 Installing WiX Toolset..." -ForegroundColor Cyan
+        Invoke-WebRequest -Uri "https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311.exe" -OutFile "wix311.exe"
+        Start-Process -FilePath "wix311.exe" -ArgumentList "/quiet" -Wait
+        
+        # Add WiX to PATH
+        $wixPath = "${env:ProgramFiles(x86)}\WiX Toolset v3.11\bin"
+        $env:PATH = "$wixPath;$env:PATH"
+        
+        # Create MSI using PowerShell script
+        Write-Host "🏗️ Building MSI installer..." -ForegroundColor Green
+        & .\setup\Build-MSI.ps1 -SourcePath "./publish/win-x64" -OutputPath "./publish" -Version "${{ steps.version.outputs.VERSION }}"
+        
+        # Fallback: Create detailed build guide if MSI build fails
+        if (-not (Test-Path "./publish/EdBindings-*.msi")) {
+          Write-Host "⚠️ MSI build not completed, creating comprehensive build guide..." -ForegroundColor Yellow
+          
+          $buildGuide = @"
+        # 🔨 EdBindings MSI Build Guide
+        
+        ## Quick Start
+        The automated MSI build requires WiX Toolset. Choose your preferred method:
+        
+        ### Method 1: WiX Toolset (Automated)
+        ``````powershell
+        # Run the automated build script
+        .\setup\Build-MSI.ps1 -SourcePath "./publish/win-x64" -OutputPath "./publish" -Version "${{ steps.version.outputs.VERSION }}"
+        ``````
+        
+        ### Method 2: Visual Studio (Manual) 
+        1. Open ``setup/EDBindingsSetup/EDBindingsSetup.vdproj`` in Visual Studio 2022
+        2. Install "Microsoft Visual Studio Installer Projects" extension if prompted
+        3. Build → Build Solution (Ctrl+Shift+B)
+        4. MSI will be generated in ``setup/EDBindingsSetup/Release/``
+        
+        ### Method 3: Alternative Installers
+        - **NSIS**: Lightweight, script-based installer
+        - **Inno Setup**: Free, professional-looking installers  
+        - **Advanced Installer**: Commercial with GUI builder
+        - **Squirrel.Windows**: Modern .NET updater framework
+        
+        ## Files Included
+        - 📁 **Published Application**: ``./publish/win-x64/`` (Ready for packaging)
+        - 📄 **WiX Source**: ``setup/EdBindings.wxs`` (MSI definition)
+        - 🔧 **Build Script**: ``setup/Build-MSI.ps1`` (Automation helper)
+        - 📋 **Legacy Project**: ``setup/EDBindingsSetup/`` (Visual Studio project)
+        
+        ## Distribution Options
+        1. **ZIP Release**: ``EdBindings-win-x64.zip`` (Available now)
+        2. **MSI Installer**: Create using methods above
+        3. **Chocolatey**: Package for ``choco install`` distribution
+        4. **Portable**: Single executable with dependencies
+        
+        > 💡 **Tip**: For immediate distribution, use the ZIP releases. MSI provides better Windows integration and uninstall support.
+        "@
+          
+          Set-Content -Path "./publish/MSI_BUILD_GUIDE.md" -Value $buildGuide
+          Write-Host "📖 Created comprehensive MSI build guide" -ForegroundColor Green
+        }
 
     - name: Create ZIP archives
       run: |
@@ -133,7 +188,8 @@ jobs:
         files: |
           ./EdBindings-win-x64.zip
           ./EdBindings-win-x86.zip
-          ./publish/MSI_BUILD_NOTES.txt
+          ./publish/EdBindings-*.msi
+          ./publish/MSI_BUILD_GUIDE.md
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
