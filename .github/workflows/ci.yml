@@ -52,25 +52,34 @@ jobs:
         Write-Host "Found $($coverageFiles.Count) coverage files:"
         $coverageFiles | ForEach-Object { Write-Host "  - $($_.FullName)" }
 
-        # Create a merged coverage directory
-        New-Item -ItemType Directory -Path "./coverage/merged" -Force | Out-Null
+        # Create a clean output directory
+        if (Test-Path "./codecov") { Remove-Item "./codecov" -Recurse -Force }
+        New-Item -ItemType Directory -Path "./codecov" -Force | Out-Null
 
-        # Copy the first coverage file to merged directory
+        # Copy the first coverage file to clean directory
         if ($coverageFiles.Count -gt 0) {
           $firstFile = $coverageFiles[0]
-          Copy-Item $firstFile.FullName "./coverage/merged/coverage.cobertura.xml"
-          Write-Host "Using coverage file: $($firstFile.FullName)"
+          Copy-Item $firstFile.FullName "./codecov/coverage.cobertura.xml"
+          Write-Host "Copied coverage file to: ./codecov/coverage.cobertura.xml"
+
+          # Remove all original coverage directories to prevent conflicts
+          Write-Host "Cleaning up original coverage files..."
+          Get-ChildItem -Path "./coverage" -Directory | ForEach-Object {
+            Write-Host "  Removing: $($_.FullName)"
+            Remove-Item $_.FullName -Recurse -Force
+          }
         }
 
-    - name: Generate HTML coverage report
+    - name: Generate HTML coverage report and upload to Codecov
       if: matrix.configuration == 'Debug'
       run: |
         # Install reportgenerator for HTML reports
         dotnet tool install -g dotnet-reportgenerator-globaltool
 
-        # Generate HTML report
-        if (Test-Path "./coverage/merged/coverage.cobertura.xml") {
-          reportgenerator -reports:"./coverage/merged/coverage.cobertura.xml" -targetdir:"./coverage/report" -reporttypes:"Html"
+        # Generate HTML report if coverage file exists
+        if (Test-Path "./codecov/coverage.cobertura.xml") {
+          New-Item -ItemType Directory -Path "./coverage/report" -Force | Out-Null
+          reportgenerator -reports:"./codecov/coverage.cobertura.xml" -targetdir:"./coverage/report" -reporttypes:"Html"
           Write-Host "HTML coverage report generated at ./coverage/report/"
         }
 
@@ -78,11 +87,14 @@ jobs:
       if: matrix.configuration == 'Debug'
       uses: codecov/codecov-action@v4
       with:
-        file: ./coverage/merged/coverage.cobertura.xml
+        file: ./codecov/coverage.cobertura.xml
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: false
         verbose: true
+        override_branch: main
+        override_build: ${{ github.run_number }}
+        override_commit: ${{ github.sha }}
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 

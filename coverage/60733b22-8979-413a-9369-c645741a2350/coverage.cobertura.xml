@@ -1,0 +1,622 @@
+<?xml version="1.0" encoding="utf-8"?>
+<coverage line-rate="0.42590000000000006" branch-rate="0.2051" version="1.9" timestamp="1761074327" lines-covered="46" lines-valid="108" branches-covered="16" branches-valid="78">
+  <sources>
+    <source>X:\Github Workspace\Elite Dangerous\EdBindings\src\EdBindings.Model.BindingsRaw\</source>
+  </sources>
+  <packages>
+    <package name="EdBindings.Model" line-rate="0.42590000000000006" branch-rate="0.2051" complexity="104">
+      <classes>
+        <class name="EdBindings.Model.ActionMapping" filename="ActionMapping.cs" line-rate="0" branch-rate="0" complexity="6">
+          <methods>
+            <method name="get_Code" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="16" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Area" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="22" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Category" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="28" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Action" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="34" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="Open" signature="(System.String)" line-rate="0" branch-rate="0" complexity="2">
+              <lines>
+                <line number="42" hits="0" branch="False" />
+                <line number="43" hits="0" branch="False" />
+                <line number="44" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="15" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="45" hits="0" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="16" hits="0" branch="False" />
+            <line number="22" hits="0" branch="False" />
+            <line number="28" hits="0" branch="False" />
+            <line number="34" hits="0" branch="False" />
+            <line number="42" hits="0" branch="False" />
+            <line number="43" hits="0" branch="False" />
+            <line number="44" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="15" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="45" hits="0" branch="False" />
+          </lines>
+        </class>
+        <class name="EdBindings.Model.DeviceControlMap" filename="DeviceControlMap.cs" line-rate="0" branch-rate="1" complexity="4">
+          <methods>
+            <method name="get_DeviceId" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="12" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="get_DeviceName" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="18" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="get_ControlLabel" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="24" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="get_ControlValue" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="30" hits="0" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="12" hits="0" branch="False" />
+            <line number="18" hits="0" branch="False" />
+            <line number="24" hits="0" branch="False" />
+            <line number="30" hits="0" branch="False" />
+          </lines>
+        </class>
+        <class name="EdBindings.Model.DeviceMap" filename="DeviceMap.cs" line-rate="0" branch-rate="0" complexity="12">
+          <methods>
+            <method name="get_Name" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="19" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Controls" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="25" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="FindControlMap" signature="(EdBindings.Model.BindingsRaw.Bindings.BindingDevice)" line-rate="0" branch-rate="0" complexity="8">
+              <lines>
+                <line number="33" hits="0" branch="False" />
+                <line number="34" hits="0" branch="True" condition-coverage="0% (0/6)">
+                  <conditions>
+                    <condition number="21" type="jump" coverage="0%" />
+                    <condition number="32" type="jump" coverage="0%" />
+                    <condition number="53" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="35" hits="0" branch="False" />
+                <line number="36" hits="0" branch="False" />
+                <line number="39" hits="0" branch="False" />
+                <line number="40" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="23" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="41" hits="0" branch="False" />
+                <line number="42" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="Open" signature="(System.String)" line-rate="0" branch-rate="0" complexity="2">
+              <lines>
+                <line number="50" hits="0" branch="False" />
+                <line number="51" hits="0" branch="False" />
+                <line number="52" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="15" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="53" hits="0" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="19" hits="0" branch="False" />
+            <line number="25" hits="0" branch="False" />
+            <line number="33" hits="0" branch="False" />
+            <line number="34" hits="0" branch="True" condition-coverage="0% (0/6)">
+              <conditions>
+                <condition number="21" type="jump" coverage="0%" />
+                <condition number="32" type="jump" coverage="0%" />
+                <condition number="53" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="35" hits="0" branch="False" />
+            <line number="36" hits="0" branch="False" />
+            <line number="39" hits="0" branch="False" />
+            <line number="40" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="23" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="41" hits="0" branch="False" />
+            <line number="42" hits="0" branch="False" />
+            <line number="50" hits="0" branch="False" />
+            <line number="51" hits="0" branch="False" />
+            <line number="52" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="15" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="53" hits="0" branch="False" />
+          </lines>
+        </class>
+        <class name="EdBindings.Model.KeyBindingView" filename="KeyBindingView.cs" line-rate="0" branch-rate="0" complexity="50">
+          <methods>
+            <method name="get_Area" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="19" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Category" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="25" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Action" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="31" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="get_PrimaryDevice" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="37" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="get_PrimaryKey" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="43" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="get_SecondaryDevice" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="49" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="get_SecondaryKey" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="55" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="get_BindEdVariable" signature="()" line-rate="0" branch-rate="1" complexity="1">
+              <lines>
+                <line number="61" hits="0" branch="False" />
+              </lines>
+            </method>
+            <method name="MakeKeyBindingView" signature="(EdBindings.Model.BindingsRaw.Bindings.BindingGroup,EdBindings.Model.DeviceMap,System.Collections.Generic.List`1&lt;EdBindings.Model.ActionMapping&gt;)" line-rate="0" branch-rate="0" complexity="42">
+              <lines>
+                <line number="71" hits="0" branch="False" />
+                <line number="72" hits="0" branch="False" />
+                <line number="74" hits="0" branch="False" />
+                <line number="75" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="7" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="76" hits="0" branch="True" condition-coverage="0% (0/4)">
+                  <conditions>
+                    <condition number="41" type="jump" coverage="0%" />
+                    <condition number="53" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="77" hits="0" branch="True" condition-coverage="0% (0/4)">
+                  <conditions>
+                    <condition number="69" type="jump" coverage="0%" />
+                    <condition number="81" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="78" hits="0" branch="True" condition-coverage="0% (0/6)">
+                  <conditions>
+                    <condition number="97" type="jump" coverage="0%" />
+                    <condition number="109" type="jump" coverage="0%" />
+                    <condition number="124" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="80" hits="0" branch="False" />
+                <line number="81" hits="0" branch="False" />
+                <line number="83" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="202" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="84" hits="0" branch="False" />
+                <line number="85" hits="0" branch="False" />
+                <line number="86" hits="0" branch="True" condition-coverage="0% (0/6)">
+                  <conditions>
+                    <condition number="217" type="jump" coverage="0%" />
+                    <condition number="230" type="jump" coverage="0%" />
+                    <condition number="240" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="87" hits="0" branch="True" condition-coverage="0% (0/6)">
+                  <conditions>
+                    <condition number="257" type="jump" coverage="0%" />
+                    <condition number="270" type="jump" coverage="0%" />
+                    <condition number="280" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="88" hits="0" branch="False" />
+                <line number="90" hits="0" branch="False" />
+                <line number="91" hits="0" branch="False" />
+                <line number="93" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="361" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="94" hits="0" branch="False" />
+                <line number="95" hits="0" branch="False" />
+                <line number="96" hits="0" branch="True" condition-coverage="0% (0/4)">
+                  <conditions>
+                    <condition number="377" type="jump" coverage="0%" />
+                    <condition number="390" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="97" hits="0" branch="True" condition-coverage="0% (0/4)">
+                  <conditions>
+                    <condition number="409" type="jump" coverage="0%" />
+                    <condition number="422" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="98" hits="0" branch="False" />
+                <line number="100" hits="0" branch="True" condition-coverage="0% (0/2)">
+                  <conditions>
+                    <condition number="457" type="jump" coverage="0%" />
+                  </conditions>
+                </line>
+                <line number="102" hits="0" branch="False" />
+                <line number="103" hits="0" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="19" hits="0" branch="False" />
+            <line number="25" hits="0" branch="False" />
+            <line number="31" hits="0" branch="False" />
+            <line number="37" hits="0" branch="False" />
+            <line number="43" hits="0" branch="False" />
+            <line number="49" hits="0" branch="False" />
+            <line number="55" hits="0" branch="False" />
+            <line number="61" hits="0" branch="False" />
+            <line number="71" hits="0" branch="False" />
+            <line number="72" hits="0" branch="False" />
+            <line number="74" hits="0" branch="False" />
+            <line number="75" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="7" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="76" hits="0" branch="True" condition-coverage="0% (0/4)">
+              <conditions>
+                <condition number="41" type="jump" coverage="0%" />
+                <condition number="53" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="77" hits="0" branch="True" condition-coverage="0% (0/4)">
+              <conditions>
+                <condition number="69" type="jump" coverage="0%" />
+                <condition number="81" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="78" hits="0" branch="True" condition-coverage="0% (0/6)">
+              <conditions>
+                <condition number="97" type="jump" coverage="0%" />
+                <condition number="109" type="jump" coverage="0%" />
+                <condition number="124" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="80" hits="0" branch="False" />
+            <line number="81" hits="0" branch="False" />
+            <line number="83" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="202" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="84" hits="0" branch="False" />
+            <line number="85" hits="0" branch="False" />
+            <line number="86" hits="0" branch="True" condition-coverage="0% (0/6)">
+              <conditions>
+                <condition number="217" type="jump" coverage="0%" />
+                <condition number="230" type="jump" coverage="0%" />
+                <condition number="240" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="87" hits="0" branch="True" condition-coverage="0% (0/6)">
+              <conditions>
+                <condition number="257" type="jump" coverage="0%" />
+                <condition number="270" type="jump" coverage="0%" />
+                <condition number="280" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="88" hits="0" branch="False" />
+            <line number="90" hits="0" branch="False" />
+            <line number="91" hits="0" branch="False" />
+            <line number="93" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="361" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="94" hits="0" branch="False" />
+            <line number="95" hits="0" branch="False" />
+            <line number="96" hits="0" branch="True" condition-coverage="0% (0/4)">
+              <conditions>
+                <condition number="377" type="jump" coverage="0%" />
+                <condition number="390" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="97" hits="0" branch="True" condition-coverage="0% (0/4)">
+              <conditions>
+                <condition number="409" type="jump" coverage="0%" />
+                <condition number="422" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="98" hits="0" branch="False" />
+            <line number="100" hits="0" branch="True" condition-coverage="0% (0/2)">
+              <conditions>
+                <condition number="457" type="jump" coverage="0%" />
+              </conditions>
+            </line>
+            <line number="102" hits="0" branch="False" />
+            <line number="103" hits="0" branch="False" />
+          </lines>
+        </class>
+        <class name="EdBindings.Model.BindingsRaw.BindingFile" filename="BindingsRaw\BindingFile.cs" line-rate="1" branch-rate="1" complexity="4">
+          <methods>
+            <method name="get_FileName" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="17" hits="2" branch="False" />
+              </lines>
+            </method>
+            <method name="get_KeyboardLayout" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="23" hits="3" branch="False" />
+              </lines>
+            </method>
+            <method name="get_Bindings" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="29" hits="3" branch="False" />
+              </lines>
+            </method>
+            <method name="Open" signature="(System.String)" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="38" hits="1" branch="False" />
+                <line number="39" hits="1" branch="False" />
+                <line number="41" hits="2640" branch="False" />
+                <line number="43" hits="1" branch="False" />
+                <line number="44" hits="1" branch="False" />
+                <line number="45" hits="1" branch="False" />
+                <line number="46" hits="1" branch="False" />
+                <line number="47" hits="1" branch="False" />
+                <line number="48" hits="1" branch="False" />
+                <line number="49" hits="1" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="17" hits="2" branch="False" />
+            <line number="23" hits="3" branch="False" />
+            <line number="29" hits="3" branch="False" />
+            <line number="38" hits="1" branch="False" />
+            <line number="39" hits="1" branch="False" />
+            <line number="41" hits="2640" branch="False" />
+            <line number="43" hits="1" branch="False" />
+            <line number="44" hits="1" branch="False" />
+            <line number="45" hits="1" branch="False" />
+            <line number="46" hits="1" branch="False" />
+            <line number="47" hits="1" branch="False" />
+            <line number="48" hits="1" branch="False" />
+            <line number="49" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="EdBindings.Model.BindingsRaw.Bindings.Binding" filename="BindingsRaw\Bindings\Binding.cs" line-rate="1" branch-rate="0.8332999999999999" complexity="7">
+          <methods>
+            <method name="get_Name" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="9" hits="2170" branch="False" />
+              </lines>
+            </method>
+            <method name="MakeBinding" signature="(System.Xml.Linq.XElement)" line-rate="1" branch-rate="0.8332999999999999" complexity="6">
+              <lines>
+                <line number="17" hits="2170" branch="False" />
+                <line number="18" hits="2170" branch="True" condition-coverage="83.33% (5/6)">
+                  <conditions>
+                    <condition number="8" type="jump" coverage="100%" />
+                    <condition number="18" type="jump" coverage="100%" />
+                    <condition number="28" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="19" hits="2170" branch="False" />
+                <line number="20" hits="2170" branch="False" />
+                <line number="21" hits="2170" branch="False" />
+                <line number="23" hits="2170" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="9" hits="2170" branch="False" />
+            <line number="17" hits="2170" branch="False" />
+            <line number="18" hits="2170" branch="True" condition-coverage="83.33% (5/6)">
+              <conditions>
+                <condition number="8" type="jump" coverage="100%" />
+                <condition number="18" type="jump" coverage="100%" />
+                <condition number="28" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="19" hits="2170" branch="False" />
+            <line number="20" hits="2170" branch="False" />
+            <line number="21" hits="2170" branch="False" />
+            <line number="23" hits="2170" branch="False" />
+          </lines>
+        </class>
+        <class name="EdBindings.Model.BindingsRaw.Bindings.BindingDevice" filename="BindingsRaw\Bindings\BindingDeviceValue.cs" line-rate="1" branch-rate="0.6" complexity="11">
+          <methods>
+            <method name="get_Device" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="9" hits="1404" branch="False" />
+              </lines>
+            </method>
+            <method name="MakeBindingDevice" signature="(System.Xml.Linq.XElement)" line-rate="1" branch-rate="0.6" complexity="10">
+              <lines>
+                <line number="17" hits="1786" branch="False" />
+                <line number="18" hits="3190" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="48" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="19" hits="382" branch="False" />
+                <line number="20" hits="382" branch="False" />
+                <line number="23" hits="1404" branch="True" condition-coverage="50% (4/8)">
+                  <conditions>
+                    <condition number="83" type="jump" coverage="50%" />
+                    <condition number="95" type="jump" coverage="50%" />
+                    <condition number="120" type="jump" coverage="50%" />
+                    <condition number="132" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="24" hits="1404" branch="False" />
+                <line number="25" hits="1404" branch="False" />
+                <line number="26" hits="1404" branch="False" />
+                <line number="27" hits="1786" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="9" hits="1404" branch="False" />
+            <line number="17" hits="1786" branch="False" />
+            <line number="18" hits="3190" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="48" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="19" hits="382" branch="False" />
+            <line number="20" hits="382" branch="False" />
+            <line number="23" hits="1404" branch="True" condition-coverage="50% (4/8)">
+              <conditions>
+                <condition number="83" type="jump" coverage="50%" />
+                <condition number="95" type="jump" coverage="50%" />
+                <condition number="120" type="jump" coverage="50%" />
+                <condition number="132" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="24" hits="1404" branch="False" />
+            <line number="25" hits="1404" branch="False" />
+            <line number="26" hits="1404" branch="False" />
+            <line number="27" hits="1786" branch="False" />
+          </lines>
+        </class>
+        <class name="EdBindings.Model.BindingsRaw.Bindings.BindingGroup" filename="BindingsRaw\Bindings\BindingGroup.cs" line-rate="0.7777" branch-rate="0.5" complexity="3">
+          <methods>
+            <method name="get_Bindings" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="10" hits="382" branch="False" />
+              </lines>
+            </method>
+            <method name="MakeBindingGroup" signature="(System.Xml.Linq.XElement)" line-rate="0.75" branch-rate="0.5" complexity="2">
+              <lines>
+                <line number="18" hits="382" branch="False" />
+                <line number="19" hits="382" branch="True" condition-coverage="50% (1/2)">
+                  <conditions>
+                    <condition number="12" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="20" hits="0" branch="False" />
+                <line number="21" hits="0" branch="False" />
+                <line number="24" hits="382" branch="False" />
+                <line number="25" hits="382" branch="False" />
+                <line number="26" hits="2084" branch="False" />
+                <line number="27" hits="382" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="10" hits="382" branch="False" />
+            <line number="18" hits="382" branch="False" />
+            <line number="19" hits="382" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="12" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="20" hits="0" branch="False" />
+            <line number="21" hits="0" branch="False" />
+            <line number="24" hits="382" branch="False" />
+            <line number="25" hits="382" branch="False" />
+            <line number="26" hits="2084" branch="False" />
+            <line number="27" hits="382" branch="False" />
+          </lines>
+        </class>
+        <class name="EdBindings.Model.BindingsRaw.Bindings.BindingValue" filename="BindingsRaw\Bindings\BindingValue.cs" line-rate="1" branch-rate="0.6666" complexity="7">
+          <methods>
+            <method name="get_Value" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="9" hits="384" branch="False" />
+              </lines>
+            </method>
+            <method name="MakeBindingValue" signature="(System.Xml.Linq.XElement)" line-rate="1" branch-rate="0.6666" complexity="6">
+              <lines>
+                <line number="18" hits="2170" branch="False" />
+                <line number="19" hits="5362" branch="True" condition-coverage="100% (2/2)">
+                  <conditions>
+                    <condition number="48" type="jump" coverage="100%" />
+                  </conditions>
+                </line>
+                <line number="20" hits="1786" branch="False" />
+                <line number="21" hits="1786" branch="False" />
+                <line number="24" hits="384" branch="True" condition-coverage="50% (2/4)">
+                  <conditions>
+                    <condition number="83" type="jump" coverage="50%" />
+                    <condition number="95" type="jump" coverage="50%" />
+                  </conditions>
+                </line>
+                <line number="25" hits="384" branch="False" />
+                <line number="26" hits="384" branch="False" />
+                <line number="27" hits="2170" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="9" hits="384" branch="False" />
+            <line number="18" hits="2170" branch="False" />
+            <line number="19" hits="5362" branch="True" condition-coverage="100% (2/2)">
+              <conditions>
+                <condition number="48" type="jump" coverage="100%" />
+              </conditions>
+            </line>
+            <line number="20" hits="1786" branch="False" />
+            <line number="21" hits="1786" branch="False" />
+            <line number="24" hits="384" branch="True" condition-coverage="50% (2/4)">
+              <conditions>
+                <condition number="83" type="jump" coverage="50%" />
+                <condition number="95" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+            <line number="25" hits="384" branch="False" />
+            <line number="26" hits="384" branch="False" />
+            <line number="27" hits="2170" branch="False" />
+          </lines>
+        </class>
+      </classes>
+    </package>
+  </packages>
+</coverage>
