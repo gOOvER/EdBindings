@@ -1,9 +1,10 @@
-namespace EdBindings
-{
-    using System;
-    using System.Diagnostics;
-    using System.Reflection;
-    using System.Windows;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using System.Windows;
+
+namespace EdBindings;
 
     /// <summary>
     /// Interaction logic for AboutWindow.xaml
@@ -39,7 +40,7 @@ namespace EdBindings
                     ? $"v{versionInfo.InformationalVersion}"
                     : "Unknown Version";
             }
-            catch
+            catch (Exception ex) when (ex is InvalidOperationException or FileNotFoundException or BadImageFormatException)
             {
                 VersionString = "Unknown Version";
             }
@@ -65,7 +66,7 @@ namespace EdBindings
             {
                 Process.Start(new ProcessStartInfo("https://github.com/gOOvER/EdBindings") { UseShellExecute = true });
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is System.ComponentModel.Win32Exception or InvalidOperationException or FileNotFoundException)
             {
                 MessageBox.Show($"Could not open website: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -82,7 +83,7 @@ namespace EdBindings
             {
                 Process.Start(new ProcessStartInfo("https://github.com/gOOvER/EdBindings/blob/main/LICENSE") { UseShellExecute = true });
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is System.ComponentModel.Win32Exception or InvalidOperationException or FileNotFoundException)
             {
                 MessageBox.Show($"Could not open license: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -100,11 +101,10 @@ namespace EdBindings
                 Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
                 e.Handled = true;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is System.ComponentModel.Win32Exception or InvalidOperationException or FileNotFoundException)
             {
                 MessageBox.Show($"Could not open link: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 e.Handled = true;
             }
         }
     }
-}

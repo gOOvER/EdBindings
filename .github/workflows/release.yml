@@ -10,6 +10,11 @@ on:
         description: 'Version to release (e.g., v1.2.3)'
         required: true
         type: string
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build-and-release:
@@ -83,9 +88,16 @@ jobs:
       id: release_notes
       run: |
         $version = "${{ steps.version.outputs.VERSION }}"
+        $isPrerelease = "${{ github.event_name == 'workflow_dispatch' && github.event.inputs.prerelease == 'true' || contains(steps.version.outputs.VERSION, '-') }}"
+        
+        $releaseType = ""
+        if ($isPrerelease -eq "true") {
+          $releaseType = "`n> **⚠️ This is a pre-release version** - Use with caution and please report any issues.`n"
+        }
+        
         $notes = @"
         ## EdBindings $version
-
+        $releaseType
         ### What's Changed
         - Built with .NET 8.0 for improved performance and security
         - Modern Windows 11-style user interface
@@ -117,7 +129,7 @@ jobs:
         name: EdBindings ${{ steps.version.outputs.VERSION }}
         body_path: ${{ steps.release_notes.outputs.NOTES_FILE }}
         draft: false
-        prerelease: ${{ contains(steps.version.outputs.VERSION, '-') }}
+        prerelease: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.prerelease == 'true' || contains(steps.version.outputs.VERSION, '-') }}
         files: |
           ./EdBindings-win-x64.zip
           ./EdBindings-win-x86.zip

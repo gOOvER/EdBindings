@@ -2,8 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace EdBindings.Model
-{
+namespace EdBindings.Model;
     /// <summary>
     /// Record ActionMapping.
     /// </summary>
@@ -44,4 +43,3 @@ namespace EdBindings.Model
             return JsonConvert.DeserializeObject<List<ActionMapping>>(json) ?? new List<ActionMapping>();
         }
     }
-}

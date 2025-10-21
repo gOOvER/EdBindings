@@ -1,6 +1,6 @@
-namespace EdBindings.Model
-{
-    /// <summary>
+namespace EdBindings.Model;
+
+/// <summary>
     /// Class DeviceControlMap.
     /// </summary>
     public class DeviceControlMap
@@ -29,4 +29,3 @@ namespace EdBindings.Model
         /// <value>The control value.</value>
         public string ControlValue { get; set; } = string.Empty;
     }
-}

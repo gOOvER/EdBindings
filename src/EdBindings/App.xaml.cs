@@ -1,11 +1,10 @@
-namespace EdBindings
-{
-    using System.Windows;
+using System.Windows;
 
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : Application
-    {
-    }
+namespace EdBindings;
+
+/// <summary>
+/// Interaction logic for App.xaml
+/// </summary>
+public partial class App : Application
+{
 }

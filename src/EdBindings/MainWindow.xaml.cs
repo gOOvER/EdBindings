@@ -1,16 +1,17 @@
-namespace EdBindings
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.ComponentModel;
-    using System.IO;
-    using System.Linq;
-    using System.Windows;
-    using System.Windows.Controls;
-    using System.Windows.Data;
-    using EdBindings.Model;
-    using EdBindings.Model.BindingsRaw;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using EdBindings.Model;
+using EdBindings.Model.BindingsRaw;
+
+namespace EdBindings;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -87,7 +88,7 @@ namespace EdBindings
 
                             DeviceMappingMenu.Items.Add(menuItem);
                         }
-                        catch (Exception ex)
+                        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException)
                         {
                             MessageBox.Show($"Error loading device mapping file {deviceMappingFile}: {ex.Message}",
                                 "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -106,7 +107,7 @@ namespace EdBindings
                     SelectActiveDeviceMapping(selectedIndex);
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException or DirectoryNotFoundException)
             {
                 MessageBox.Show($"Error during initialization: {ex.Message}",
                     "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -134,7 +135,9 @@ namespace EdBindings
         private void SelectActiveDeviceMapping(int index)
         {
             if (index < 0 || index >= DeviceMappingMenu.Items.Count)
+            {
                 return;
+            }
 
             try
             {
@@ -157,7 +160,7 @@ namespace EdBindings
                 DeviceFileStatusBar.Text = $"Device Mapping: {menuItem.Header}";
                 ProcessBindingFile();
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is InvalidOperationException or ArgumentException or IOException)
             {
                 MessageBox.Show($"Error selecting device mapping: {ex.Message}",
                     "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -193,7 +196,7 @@ namespace EdBindings
                     ProcessBindingFile();
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException or FileNotFoundException)
             {
                 MessageBox.Show($"Error opening bindings file: {ex.Message}",
                     "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -228,7 +231,7 @@ namespace EdBindings
                 KeyboardLayoutStatusBar.Text = BindingFile.KeyboardLayout;
                 txtFilter.Text = PlaceHolderText;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is InvalidOperationException or ArgumentException or NullReferenceException)
             {
                 MessageBox.Show($"Error processing binding file: {ex.Message}",
                     "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -242,7 +245,10 @@ namespace EdBindings
         /// <param name="e">The <see cref="System.Windows.Input.KeyEventArgs"/> instance containing the event data.</param>
         private void TxtFilterKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (KeyBindings == null) return;
+            if (KeyBindings == null)
+            {
+                return;
+            }
 
             var filterText = txtFilter.Text ?? string.Empty;
 
@@ -254,7 +260,10 @@ namespace EdBindings
             {
                 KeyBindings.Filter = item =>
                 {
-                    if (item is not KeyBindingView binding) return false;
+                    if (item is not KeyBindingView binding)
+                    {
+                        return false;
+                    }
 
                     return binding.Action?.Contains(filterText, StringComparison.InvariantCultureIgnoreCase) == true
                         || binding.PrimaryKey?.Contains(filterText, StringComparison.InvariantCultureIgnoreCase) == true
@@ -306,7 +315,7 @@ namespace EdBindings
                 };
                 dialog.ShowDialog();
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is InvalidOperationException or OutOfMemoryException)
             {
                 MessageBox.Show($"Error opening About dialog: {ex.Message}",
                     "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -328,4 +337,3 @@ namespace EdBindings
             }
         }
     }
-}

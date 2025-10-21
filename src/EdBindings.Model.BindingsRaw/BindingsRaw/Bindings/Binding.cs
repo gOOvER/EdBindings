@@ -1,7 +1,7 @@
-namespace EdBindings.Model.BindingsRaw.Bindings
-{
-    using System;
-    using System.Xml.Linq;
+using System;
+using System.Xml.Linq;
+
+namespace EdBindings.Model.BindingsRaw.Bindings;
 
     /// <summary>
     /// Record Binding.
@@ -23,4 +23,3 @@ namespace EdBindings.Model.BindingsRaw.Bindings
         }
 
     }
-}
