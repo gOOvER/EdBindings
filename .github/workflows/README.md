@@ -89,7 +89,10 @@ Add these badges to your main README.md:
 
 3. **Release Artifacts Missing**: Ensure the project builds successfully and all paths in the workflow are correct.
 
-4. **Code Formatting Fails**: The CI checks code formatting using `dotnet format`. Run `.\format-code.ps1` locally to fix formatting issues before pushing.
+4. **Code Formatting Fails**: The CI checks code formatting using `dotnet format --verify-no-changes`. To fix:
+   - Run `.\format-code.ps1` locally to auto-format code
+   - Or run `dotnet format` directly
+   - Commit the formatted changes and push again
 
 ### Local Testing:
 Before pushing, you can test the build process locally:
@@ -100,6 +103,9 @@ Before pushing, you can test the build process locally:
 
 # Auto-format code if needed  
 .\format-code.ps1
+
+# Auto-format and commit in one step (if CI fails due to formatting)
+.\format-and-commit.ps1
 
 # Test CI build
 dotnet restore

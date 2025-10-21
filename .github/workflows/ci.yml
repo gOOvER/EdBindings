@@ -93,17 +93,21 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
 
-    - name: Format code
-      run: dotnet format --verbosity diagnostic
-
-    - name: Check for format changes
+    - name: Check code formatting
       run: |
-        if (git diff --exit-code) {
+        Write-Host "Checking code formatting..."
+        dotnet format --verify-no-changes --verbosity diagnostic
+        if ($LASTEXITCODE -eq 0) {
           Write-Host "✅ Code formatting is correct"
         } else {
-          Write-Host "❌ Code formatting issues found. The following files were auto-formatted:"
-          git diff --name-only
-          Write-Host "Please run 'dotnet format' locally and commit the changes."
+          Write-Host ""
+          Write-Host "❌ Code formatting issues found!"
+          Write-Host ""
+          Write-Host "To fix this:"
+          Write-Host "1. Run: dotnet format"
+          Write-Host "2. Or use: .\format-code.ps1"
+          Write-Host "3. Commit the formatted changes"
+          Write-Host ""
           exit 1
         }
 
