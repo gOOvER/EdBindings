@@ -40,17 +40,41 @@ jobs:
       run: dotnet build --configuration ${{ matrix.configuration }} --no-restore
 
     - name: Run tests
-      run: dotnet test --configuration ${{ matrix.configuration }} --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
+      run: dotnet test --configuration ${{ matrix.configuration }} --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage --logger trx --logger "console;verbosity=detailed"
+
+    - name: Process coverage reports
+      if: matrix.configuration == 'Debug'
+      run: |
+        # Install reportgenerator for better coverage reports
+        dotnet tool install -g dotnet-reportgenerator-globaltool
+
+        # Generate coverage report
+        reportgenerator -reports:"./coverage/**/coverage.cobertura.xml" -targetdir:"./coverage/report" -reporttypes:"Html;Cobertura"
+
+        # Display coverage summary
+        Write-Host "Coverage Summary:"
+        Get-Content "./coverage/report/index.html" | Select-String -Pattern "Line coverage:" | ForEach-Object { Write-Host $_ }
 
     - name: Upload coverage reports to Codecov
       if: matrix.configuration == 'Debug'
       uses: codecov/codecov-action@v4
       with:
         directory: ./coverage
+        files: ./coverage/**/coverage.cobertura.xml
+        flags: unittests
+        name: codecov-umbrella
         fail_ci_if_error: false
         verbose: true
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+    - name: Upload coverage artifacts
+      if: matrix.configuration == 'Debug'
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: ./coverage/report/
+        retention-days: 30
 
   code-quality:
     runs-on: windows-latest
@@ -69,8 +93,19 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
 
-    - name: Check code formatting
-      run: dotnet format --verify-no-changes --verbosity diagnostic
+    - name: Format code
+      run: dotnet format --verbosity diagnostic
+
+    - name: Check for format changes
+      run: |
+        if (git diff --exit-code) {
+          Write-Host "✅ Code formatting is correct"
+        } else {
+          Write-Host "❌ Code formatting issues found. The following files were auto-formatted:"
+          git diff --name-only
+          Write-Host "Please run 'dotnet format' locally and commit the changes."
+          exit 1
+        }
 
     - name: Build with warnings as errors
       run: dotnet build --configuration Release --verbosity normal

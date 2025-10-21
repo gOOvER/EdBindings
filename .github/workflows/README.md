@@ -46,7 +46,7 @@ This directory contains GitHub Actions workflows for the EdBindings project.
 ### 1. Repository Secrets (Optional)
 Add these secrets in your GitHub repository settings if you want enhanced features:
 
-- `CODECOV_TOKEN`: For code coverage reporting (optional)
+- `CODECOV_TOKEN`: For code coverage reporting with Codecov.io (optional but recommended)
 
 ### 2. Branch Protection (Recommended)
 Configure branch protection rules for `main` branch:
@@ -74,6 +74,7 @@ Add these badges to your main README.md:
 
 ```markdown
 [![CI](https://github.com/gOOvER/EdBindings/actions/workflows/ci.yml/badge.svg)](https://github.com/gOOvER/EdBindings/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/gOOvER/EdBindings/branch/main/graph/badge.svg)](https://codecov.io/gh/gOOvER/EdBindings)
 [![Security Scan](https://github.com/gOOvER/EdBindings/actions/workflows/security.yml/badge.svg)](https://github.com/gOOvER/EdBindings/actions/workflows/security.yml)
 [![Release](https://github.com/gOOvER/EdBindings/actions/workflows/release.yml/badge.svg)](https://github.com/gOOvER/EdBindings/actions/workflows/release.yml)
 ```
@@ -88,10 +89,18 @@ Add these badges to your main README.md:
 
 3. **Release Artifacts Missing**: Ensure the project builds successfully and all paths in the workflow are correct.
 
+4. **Code Formatting Fails**: The CI checks code formatting using `dotnet format`. Run `.\format-code.ps1` locally to fix formatting issues before pushing.
+
 ### Local Testing:
 Before pushing, you can test the build process locally:
 
 ```bash
+# Test code formatting (recommended before every commit)
+.\format-code.ps1 -Check
+
+# Auto-format code if needed  
+.\format-code.ps1
+
 # Test CI build
 dotnet restore
 dotnet build --configuration Release

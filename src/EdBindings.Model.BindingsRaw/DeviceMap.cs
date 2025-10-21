@@ -1,11 +1,11 @@
-﻿namespace EdBindings.Model
+namespace EdBindings.Model
 {
-    using EdBindings.Model.BindingsRaw.Bindings;
-    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using EdBindings.Model.BindingsRaw.Bindings;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// Class DeviceMap.

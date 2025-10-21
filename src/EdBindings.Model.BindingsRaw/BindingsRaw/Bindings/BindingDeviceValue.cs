@@ -1,4 +1,4 @@
-﻿namespace EdBindings.Model.BindingsRaw.Bindings
+namespace EdBindings.Model.BindingsRaw.Bindings
 {
     using System.Linq;
     using System.Xml.Linq;
@@ -15,7 +15,7 @@
         /// <returns>EdBindings.Model.BindingsRaw.Bindings.Binding.</returns>
         public static Binding? MakeBindingDevice(XElement element)
         {
-            if(!element.Attributes().Any(attribute => attribute.Name == "Device"))
+            if (!element.Attributes().Any(attribute => attribute.Name == "Device"))
             {
                 return null;
             }

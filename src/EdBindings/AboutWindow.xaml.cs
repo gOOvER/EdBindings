@@ -1,4 +1,4 @@
-﻿namespace EdBindings
+namespace EdBindings
 {
     using System;
     using System.Diagnostics;

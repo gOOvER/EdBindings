@@ -1,7 +1,5 @@
-﻿namespace EdBindings
+namespace EdBindings
 {
-    using EdBindings.Model;
-    using EdBindings.Model.BindingsRaw;
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
@@ -11,6 +9,8 @@
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Data;
+    using EdBindings.Model;
+    using EdBindings.Model.BindingsRaw;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml

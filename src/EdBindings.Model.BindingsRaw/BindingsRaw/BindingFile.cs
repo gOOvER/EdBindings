@@ -1,10 +1,9 @@
-﻿namespace EdBindings.Model.BindingsRaw
+namespace EdBindings.Model.BindingsRaw
 {
-    using EdBindings.Model.BindingsRaw.Bindings;
-
     using System.Collections.Generic;
     using System.Linq;
     using System.Xml.Linq;
+    using EdBindings.Model.BindingsRaw.Bindings;
 
     /// <summary>
     /// Record BindingFile.

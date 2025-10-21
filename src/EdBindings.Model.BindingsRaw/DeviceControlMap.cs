@@ -1,4 +1,4 @@
-﻿namespace EdBindings.Model
+namespace EdBindings.Model
 {
     /// <summary>
     /// Class DeviceControlMap.

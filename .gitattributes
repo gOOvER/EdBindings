@@ -1,0 +1,84 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# C# files should always use UTF-8 with BOM
+*.cs text eol=crlf encoding=utf-8-bom
+
+# Solution and project files
+*.sln text eol=crlf encoding=utf-8-bom
+*.csproj text eol=crlf encoding=utf-8
+*.vbproj text eol=crlf encoding=utf-8
+*.vcxproj text eol=crlf encoding=utf-8
+*.vcxproj.filters text eol=crlf encoding=utf-8
+*.proj text eol=crlf encoding=utf-8
+*.projitems text eol=crlf encoding=utf-8
+*.shproj text eol=crlf encoding=utf-8
+
+# XML files
+*.xml text eol=crlf encoding=utf-8
+*.xaml text eol=crlf encoding=utf-8
+*.config text eol=crlf encoding=utf-8
+*.props text eol=crlf encoding=utf-8
+*.targets text eol=crlf encoding=utf-8
+*.nuspec text eol=crlf encoding=utf-8
+*.resx text eol=crlf encoding=utf-8
+*.vsixmanifest text eol=crlf encoding=utf-8
+
+# JSON files
+*.json text eol=crlf encoding=utf-8
+
+# YAML files
+*.yml text eol=lf encoding=utf-8
+*.yaml text eol=lf encoding=utf-8
+
+# Markdown files
+*.md text eol=lf encoding=utf-8
+
+# Text files
+*.txt text eol=crlf encoding=utf-8
+
+# PowerShell files
+*.ps1 text eol=crlf encoding=utf-8-bom
+
+# Batch files
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Shell scripts
+*.sh text eol=lf
+
+# Binary files
+*.exe binary
+*.dll binary
+*.pdb binary
+*.zip binary
+*.7z binary
+*.tar binary
+*.gz binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.bmp binary
+*.tiff binary
+
+# Font files
+*.woff binary
+*.woff2 binary
+*.eot binary
+*.ttf binary
+*.otf binary
+
+# Archive files
+*.zip binary
+*.7z binary
+*.rar binary
+*.tar binary
+*.gz binary
+
+# MSI files
+*.msi binary
+
+# Visual Studio files
+*.vdproj text eol=crlf encoding=utf-8

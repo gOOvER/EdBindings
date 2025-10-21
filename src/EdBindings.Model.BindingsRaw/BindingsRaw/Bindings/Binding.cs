@@ -1,4 +1,4 @@
-﻿namespace EdBindings.Model.BindingsRaw.Bindings
+namespace EdBindings.Model.BindingsRaw.Bindings
 {
     using System;
     using System.Xml.Linq;

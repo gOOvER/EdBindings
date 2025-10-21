@@ -1,11 +1,10 @@
-﻿namespace EdBindings.Model
+namespace EdBindings.Model
 {
-    using EdBindings.Model.BindingsRaw.Bindings;
-
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using EdBindings.Model.BindingsRaw.Bindings;
 
     /// <summary>
     /// Class KeyBindingView.
