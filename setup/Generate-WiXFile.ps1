@@ -20,7 +20,8 @@ Write-Host "📋 Found $($allFiles.Count) files to include" -ForegroundColor Yel
 # Erzeuge WiX Content
 $wxsContent = @"
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
   <Package Id="EdBindingsPackage"
            Name="Elite Dangerous Bindings Viewer"
            Language="1033"
@@ -33,6 +34,26 @@ $wxsContent = @"
 
     <!-- Icon Definition -->
     <Icon Id="EdBindings.exe" SourceFile="`$(var.SourceDir)/EdBindings.exe" />
+
+    <!-- Properties for customization -->
+    <Property Id="ARPPRODUCTICON" Value="EdBindings.exe" />
+    <Property Id="ARPHELPLINK" Value="https://github.com/gOOvER/EdBindings" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/gOOvER/EdBindings" />
+    <Property Id="ARPCOMMENTS" Value="Elite Dangerous Bindings Viewer - View and manage your Elite Dangerous key bindings" />
+    <!-- WiX UI Extension mit korrekter v6 Syntax -->
+    <ui:WixUI xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
+              Id="WixUI_InstallDir"
+              InstallDirectory="INSTALLFOLDER" />
+
+    <!-- License file configuration -->
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+
+    <!-- Optional: Error and progress text -->
+    <UIRef Id="WixUI_ErrorProgressText" />
+
+    <!-- Completion dialog customization -->
+    <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT"
+              Value="Elite Dangerous Bindings Viewer wurde erfolgreich installiert. Sie finden eine Desktop-Verknüpfung und einen Eintrag im Startmenü." />
 
     <!-- Standard directory structure -->
     <StandardDirectory Id="ProgramFilesFolder">
