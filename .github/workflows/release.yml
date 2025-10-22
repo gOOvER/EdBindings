@@ -73,41 +73,21 @@ jobs:
         echo "Version: $version"
         Write-Host "📋 Using version: $version" -ForegroundColor Green
 
-    - name: 🔨 Build MSI Installer (Automated)
+    - name: 🔨 Build MSI Installer (WiX v6.0.2)
       run: |
-        # Install WiX Toolset v3.14 (latest stable)
-        Write-Host "🔽 Installing WiX Toolset..." -ForegroundColor Cyan
-        $wixUrl = "https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314.exe"
-        $wixInstaller = "wix314.exe"
-
-        Invoke-WebRequest -Uri $wixUrl -OutFile $wixInstaller
-        Write-Host "📦 Running WiX installer..." -ForegroundColor Cyan
-        Start-Process -FilePath $wixInstaller -ArgumentList "/quiet" -Wait
-
-        # Add WiX to PATH (check multiple possible locations)
-        $possiblePaths = @(
-          "${env:ProgramFiles(x86)}\WiX Toolset v3.14\bin",
-          "${env:ProgramFiles}\WiX Toolset v3.14\bin",
-          "${env:ProgramFiles(x86)}\WiX Toolset v3.11\bin"
-        )
-
-        $wixPath = $null
-        foreach ($path in $possiblePaths) {
-          if (Test-Path "$path\candle.exe") {
-            $wixPath = $path
-            Write-Host "✅ Found WiX at: $wixPath" -ForegroundColor Green
-            break
-          }
-        }
-
-        if (-not $wixPath) {
-          Write-Host "❌ WiX installation failed or not found" -ForegroundColor Red
-          throw "WiX Toolset installation failed"
-        }
-
-        # Add WiX to PATH for current session
-        $env:PATH = "$wixPath;$env:PATH"
-        Write-Host "📝 Added WiX to PATH: $wixPath" -ForegroundColor Cyan
+        # Install WiX v6.0.2 via .NET Tool (latest version, free for MIT projects)
+        Write-Host "🔽 Installing WiX Toolset v6.0.2..." -ForegroundColor Cyan
+        dotnet tool install --global wix --version 6.0.2
+        
+        # Verify WiX installation
+        Write-Host "✅ WiX v6 installed successfully" -ForegroundColor Green
+        wix --version
+        
+        # Create MSI using PowerShell script with WiX v5
+        Write-Host "🏗️ Building MSI installer..." -ForegroundColor Green
+        $version = "${{ steps.version.outputs.VERSION }}"
+        Write-Host "Building MSI for version: $version" -ForegroundColor Cyan
+        $buildSuccess = & .\setup\Build-MSI.ps1 -SourcePath "./publish/win-x64" -OutputPath "./publish" -Version $version
 
         # Create MSI using PowerShell script
         Write-Host "🏗️ Building MSI installer..." -ForegroundColor Green
@@ -156,10 +136,18 @@ jobs:
         - **Advanced Installer**: Commercial with GUI builder
         - **Squirrel.Windows**: Modern .NET updater framework
 
+        ### Method 4: WiX v6.0.2 (.NET Tool) - Current
+        - **Latest**: Uses WiX v6.0.2 (newest version with latest features)
+        - **Modern**: .NET-based toolset with improved performance
+        - **MIT Licensed**: Free for open-source projects like EdBindings
+        - **Command**: ``dotnet tool install --global wix --version 6.0.2``
+
         ## Files Included
         - 📁 **Published Application**: ``./publish/win-x64/`` (Ready for packaging)
-        - 📄 **WiX Source**: ``setup/EdBindings.wxs`` (MSI definition)
-        - 🔧 **Build Script**: ``setup/Build-MSI.ps1`` (Automation helper)
+        - 📄 **WiX v6 Source**: ``setup/EdBindings-v6.wxs`` (Current format)
+        - 📄 **WiX v5 Source**: ``setup/EdBindings-v5.wxs`` (Fallback)
+        - 📄 **WiX v3 Source**: ``setup/EdBindings.wxs`` (Legacy format)
+        - 🔧 **Build Script**: ``setup/Build-MSI.ps1`` (Auto-detects WiX version)
         - 📋 **Legacy Project**: ``setup/EDBindingsSetup/`` (Visual Studio project)
 
         ## Distribution Options

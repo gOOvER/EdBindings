@@ -52,12 +52,17 @@ if (-not (Test-Path $OutputPath)) {
     New-Item -ItemType Directory -Path $OutputPath -Force
 }
 
-# Check for WiX
+# Check for WiX (.NET Tool)
 $wixFound = $false
+$wixVersion = ""
 try {
-    $null = Get-Command "candle.exe" -ErrorAction Stop
-    $wixFound = $true
-    Write-Host "WiX Toolset found" -ForegroundColor Green
+    $wixVersion = & wix --version 2>&1
+    if ($wixVersion -match "\d+\.\d+\.\d+") {
+        $wixFound = $true
+        Write-Host "WiX Toolset found: $wixVersion" -ForegroundColor Green
+    } else {
+        Write-Host "WiX found but version unclear: $wixVersion" -ForegroundColor Yellow
+    }
 }
 catch {
     Write-Host "WiX Toolset not found, creating instructions" -ForegroundColor Yellow
@@ -78,7 +83,14 @@ Alternative: Use Visual Studio with Installer Projects extension
 }
 
 try {
-    $wxsFile = Join-Path $PSScriptRoot "EdBindings.wxs"
+    # Use appropriate .wxs file based on WiX version
+    $wxsFile = if ($wixFound -and $wixVersion -match "6\.") {
+        Join-Path $PSScriptRoot "EdBindings-v6.wxs"
+    } elseif ($wixFound -and $wixVersion -match "5\.") {
+        Join-Path $PSScriptRoot "EdBindings-v5.wxs"
+    } else {
+        Join-Path $PSScriptRoot "EdBindings.wxs"
+    }
     $objFile = Join-Path $OutputPath "EdBindings.wixobj"
     $msiFile = Join-Path $OutputPath "$ProductName-$Version.msi"
     
@@ -109,33 +121,21 @@ try {
     
     Write-Host "✅ All required files found" -ForegroundColor Green
     
-    Write-Host "Compiling WiX source..." -ForegroundColor Cyan
+    Write-Host "Building MSI with WiX..." -ForegroundColor Cyan
     Write-Host "Using normalized version: $NormalizedVersion" -ForegroundColor Yellow
-    Write-Host "Command: candle.exe `"$wxsFile`" -dSourceDir=`"$SourcePath`" -dVersion=`"$NormalizedVersion`" -o `"$objFile`"" -ForegroundColor Gray
+    Write-Host "Command: wix build `"$wxsFile`" -d SourceDir=`"$SourcePath`" -d Version=`"$NormalizedVersion`" -o `"$msiFile`"" -ForegroundColor Gray
     
-    $candleResult = & candle.exe $wxsFile -dSourceDir="$SourcePath" -dVersion="$NormalizedVersion" -o $objFile 2>&1
-    Write-Host "Candle output: $candleResult" -ForegroundColor Gray
+    $wixResult = & wix build $wxsFile -d "SourceDir=$SourcePath" -d "Version=$NormalizedVersion" -o $msiFile 2>&1
+    Write-Host "WiX build output: $wixResult" -ForegroundColor Gray
     
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "✅ Compilation successful" -ForegroundColor Green
-        Write-Host "Linking MSI..." -ForegroundColor Cyan
-        Write-Host "Command: light.exe `"$objFile`" -o `"$msiFile`" -ext WixUIExtension" -ForegroundColor Gray
-        
-        $lightResult = & light.exe $objFile -o $msiFile -ext WixUIExtension 2>&1
-        Write-Host "Light output: $lightResult" -ForegroundColor Gray
-        
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "✅ MSI created: $msiFile" -ForegroundColor Green
-            return $true
-        } else {
-            Write-Host "❌ Light.exe failed with exit code: $LASTEXITCODE" -ForegroundColor Red
-        }
+        Write-Host "✅ MSI created successfully: $msiFile" -ForegroundColor Green
+        return $true
     } else {
-        Write-Host "❌ Candle.exe failed with exit code: $LASTEXITCODE" -ForegroundColor Red
+        Write-Host "❌ WiX build failed with exit code: $LASTEXITCODE" -ForegroundColor Red
+        Write-Host "MSI build failed" -ForegroundColor Red
+        return $false
     }
-    
-    Write-Host "MSI build failed" -ForegroundColor Red
-    return $false
 }
 catch {
     Write-Host "Error: $_" -ForegroundColor Red

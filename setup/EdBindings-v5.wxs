@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Id="*" 
+           Name="EdBindings" 
+           Language="1033" 
+           Version="$(var.Version)" 
+           Manufacturer="Elite Dangerous Community"
+           UpgradeCode="12345678-1234-1234-1234-123456789012"
+           InstallerVersion="200" 
+           Compressed="yes" 
+           InstallScope="perMachine" 
+           Description="EdBindings - Elite Dangerous Key Binding Viewer"
+           Comments="Elite Dangerous key binding configuration tool">
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Features -->
+    <Feature Id="ProductFeature" Title="EdBindings" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentRef Id="ApplicationShortcuts" />
+    </Feature>
+
+    <!-- Installation directory -->
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="EdBindings" />
+    </StandardDirectory>
+    
+    <!-- Start Menu -->
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="EdBindings" />
+    </StandardDirectory>
+    
+    <!-- Desktop -->
+    <StandardDirectory Id="DesktopFolder" />
+
+    <!-- Components -->
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <!-- Main executable -->
+      <Component Id="EdBindings.exe" Guid="*">
+        <File Source="$(var.SourceDir)\EdBindings.exe" />
+      </Component>
+      
+      <!-- Dependencies -->
+      <Component Id="EdBindings.Model.dll" Guid="*">
+        <File Source="$(var.SourceDir)\EdBindings.Model.dll" />
+      </Component>
+      
+      <Component Id="EdBindings.deps.json" Guid="*">
+        <File Source="$(var.SourceDir)\EdBindings.deps.json" />
+      </Component>
+      
+      <Component Id="EdBindings.runtimeconfig.json" Guid="*">
+        <File Source="$(var.SourceDir)\EdBindings.runtimeconfig.json" />
+      </Component>
+      
+      <Component Id="Newtonsoft.Json.dll" Guid="*">
+        <File Source="$(var.SourceDir)\Newtonsoft.Json.dll" />
+      </Component>
+      
+      <Component Id="ActionMappings.json" Guid="*">
+        <File Source="$(var.SourceDir)\ActionMappings.json" />
+      </Component>
+
+      <!-- Device Mappings Directory -->
+      <Component Id="DeviceMappings" Guid="*">
+        <CreateFolder />
+        <Files Include="$(var.SourceDir)\DeviceMappings\*" />
+      </Component>
+    </ComponentGroup>
+
+    <!-- Shortcuts -->
+    <Component Id="ApplicationShortcuts" Directory="ApplicationProgramsFolder" Guid="*">
+      <Shortcut Id="ApplicationStartMenuShortcut"
+                Name="EdBindings"
+                Description="Elite Dangerous Key Binding Viewer"
+                Target="[#EdBindings.exe]"
+                WorkingDirectory="INSTALLFOLDER" />
+                
+      <Shortcut Id="ApplicationDesktopShortcut"
+                Directory="DesktopFolder"
+                Name="EdBindings"
+                Description="Elite Dangerous Key Binding Viewer"
+                Target="[#EdBindings.exe]"
+                WorkingDirectory="INSTALLFOLDER" />
+                
+      <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall" />
+      <RegistryValue Root="HKCU" 
+                     Key="Software\EdBindings" 
+                     Name="installed" 
+                     Type="integer" 
+                     Value="1" 
+                     KeyPath="yes" />
+    </Component>
+
+    <!-- UI -->
+    <UIRef Id="WixUI_InstallDir" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    
+    <!-- License -->
+    <WixVariable Id="WixUILicenseRtf" Value="$(sys.CURRENTDIR)\setup\License.rtf" />
+    
+    <!-- Branding -->
+    <Property Id="ARPPRODUCTICON" Value="EdBindings.exe" />
+    <Property Id="ARPHELPLINK" Value="https://github.com/gOOvER/EdBindings" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/gOOvER/EdBindings" />
+  </Package>
+</Wix>

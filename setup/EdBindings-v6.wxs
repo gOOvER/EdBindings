@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Id="EdBindings" 
+           Name="EdBindings" 
+           Language="1033" 
+           Version="$(var.Version)" 
+           Manufacturer="Elite Dangerous Community"
+           InstallerVersion="500" 
+           Compressed="yes">
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    
+    <!-- Simple file inclusion with modern WiX v6 syntax -->
+    <Files Include="$(var.SourceDir)\*" />
+    
+    <!-- Branding -->
+    <Property Id="ARPHELPLINK" Value="https://github.com/gOOvER/EdBindings" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/gOOvER/EdBindings" />
+  </Package>
+</Wix>
