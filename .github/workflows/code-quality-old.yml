@@ -1,6 +1,15 @@
-name: 📊 Code Quality Analysis
+name: 📊 Code Quality Analysis (BACKUP - DISABLED)
 
+# This workflow is disabled - it's a backup of the old complex workflow
+# The new simplified workflow is in code-quality.yml
 on:
+  workflow_dispatch:
+    inputs:
+      force_run:
+        description: 'Force run of backup workflow (for testing only)'
+        required: false
+        type: boolean
+        default: false
   pull_request:
     branches: [ main, develop ]
   push:
