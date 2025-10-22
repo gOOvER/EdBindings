@@ -105,26 +105,23 @@ jobs:
           throw "WiX Toolset installation failed"
         }
         
+        # Add WiX to PATH for current session
         $env:PATH = "$wixPath;$env:PATH"
-        # Try alternative WiX installation if direct download fails
-        if (-not $wixPath) {
-          Write-Host "🔄 Trying alternative WiX installation via Chocolatey..." -ForegroundColor Yellow
-          try {
-            choco install wixtoolset -y
-            $wixPath = "${env:ProgramFiles(x86)}\WiX Toolset v3.11\bin"
-            if (Test-Path "$wixPath\candle.exe") {
-              $env:PATH = "$wixPath;$env:PATH"
-              Write-Host "✅ WiX installed via Chocolatey" -ForegroundColor Green
-            }
-          } catch {
-            Write-Host "⚠️ Chocolatey installation also failed" -ForegroundColor Yellow
-          }
-        }
+        Write-Host "📝 Added WiX to PATH: $wixPath" -ForegroundColor Cyan
         
         # Create MSI using PowerShell script  
         Write-Host "🏗️ Building MSI installer..." -ForegroundColor Green
         $version = "${{ steps.version.outputs.VERSION }}"
         Write-Host "Building MSI for version: $version" -ForegroundColor Cyan
+        
+        # Verify WiX is accessible
+        try {
+          $candleVersion = & candle.exe -? 2>&1 | Select-Object -First 1
+          Write-Host "✅ WiX Candle accessible: $candleVersion" -ForegroundColor Green
+        } catch {
+          Write-Host "⚠️ WiX Candle not accessible, MSI build will create instructions only" -ForegroundColor Yellow
+        }
+        
         $buildSuccess = & .\setup\Build-MSI.ps1 -SourcePath "./publish/win-x64" -OutputPath "./publish" -Version $version
         
         if (-not $buildSuccess) {

@@ -9,7 +9,43 @@ param(
     [string]$ProductName = "EdBindings"
 )
 
-Write-Host "Building MSI for $ProductName version $Version" -ForegroundColor Green
+# Normalize version for MSI compatibility (WiX requires x.y.z.w format)
+function Normalize-Version {
+    param([string]$InputVersion)
+    
+    # Remove any leading dots or dashes
+    $cleanVersion = $InputVersion -replace '^[\.\-]+', ''
+    
+    # Handle pre-release versions (remove -beta, -alpha, etc.)
+    $cleanVersion = $cleanVersion -replace '\-.*$', ''
+    
+    # Ensure we have at least 3 parts (x.y.z)
+    $parts = $cleanVersion.Split('.')
+    while ($parts.Length -lt 3) {
+        $parts += "0"
+    }
+    
+    # WiX allows max 4 parts, truncate if more
+    if ($parts.Length -gt 4) {
+        $parts = $parts[0..3]
+    }
+    
+    # Join and validate each part is numeric
+    $normalizedParts = @()
+    foreach ($part in $parts) {
+        $numericPart = [regex]::Match($part, '^\d+').Value
+        if ([string]::IsNullOrEmpty($numericPart)) {
+            $numericPart = "0"
+        }
+        $normalizedParts += $numericPart
+    }
+    
+    return $normalizedParts -join '.'
+}
+
+$NormalizedVersion = Normalize-Version -InputVersion $Version
+
+Write-Host "Building MSI for $ProductName version $Version (normalized: $NormalizedVersion)" -ForegroundColor Green
 
 # Create output directory
 if (-not (Test-Path $OutputPath)) {
@@ -32,7 +68,7 @@ if (-not $wixFound) {
 EdBindings MSI Build Instructions
 
 1. Install WiX Toolset v3.11+ from https://wixtoolset.org/
-2. Run: candle.exe EdBindings.wxs -dSourceDir="$SourcePath" -dVersion="$Version" -o EdBindings.wixobj
+2. Run: candle.exe EdBindings.wxs -dSourceDir="$SourcePath" -dVersion="$NormalizedVersion" -o EdBindings.wixobj
 3. Run: light.exe EdBindings.wixobj -o "$ProductName-$Version.msi" -ext WixUIExtension
 
 Alternative: Use Visual Studio with Installer Projects extension
@@ -47,7 +83,8 @@ try {
     $msiFile = Join-Path $OutputPath "$ProductName-$Version.msi"
     
     Write-Host "Compiling WiX source..." -ForegroundColor Cyan
-    & candle.exe $wxsFile -dSourceDir="$SourcePath" -dVersion="$Version" -o $objFile
+    Write-Host "Using normalized version: $NormalizedVersion" -ForegroundColor Yellow
+    & candle.exe $wxsFile -dSourceDir="$SourcePath" -dVersion="$NormalizedVersion" -o $objFile
     
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Linking MSI..." -ForegroundColor Cyan
