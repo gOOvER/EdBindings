@@ -23,6 +23,58 @@ A Windows application for Elite Dangerous that reads and displays key binding fi
 * Windows 10 or later
 * .NET 8 Runtime
 
+## Installation
+
+### Option 1: Download Release (Recommended)
+
+1. Go to the [Releases page](https://github.com/gOOvER/EdBindings/releases)
+2. Download the latest `EdBindings-Setup.msi` installer
+3. Run the installer and follow the setup wizard
+4. Launch EdBindings from the Start Menu or Desktop shortcut
+
+### Option 2: Portable Version
+
+1. Download the portable ZIP from the [Releases page](https://github.com/gOOvER/EdBindings/releases)
+2. Extract to your preferred location
+3. Run `EdBindings.exe`
+
+### Option 3: Build from Source
+
+1. Clone the repository: `git clone https://github.com/gOOvER/EdBindings.git`
+2. Install [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+3. Build: `dotnet build`
+4. Run: `dotnet run --project src/EdBindings`
+
+## Usage
+
+### Getting Started
+
+1. **Launch EdBindings** - Start the application from your Start Menu or Desktop
+2. **Load Bindings File** - Click "Load Bindings" or use File → Open to select your Elite Dangerous `.binds` file
+   - Default location: `%LOCALAPPDATA%\Frontier Developments\Elite Dangerous\Options\Bindings\`
+3. **Select Device Mapping** (Optional) - Choose a device mapping from the dropdown to see friendly names instead of codes
+4. **Browse and Search** - Use the search box and filters to find specific key bindings
+
+### Key Features
+
+* **Search**: Type in the search box to filter bindings by action name, key, or device
+* **Device Mapping**: Select your HOTAS/controller from the dropdown for human-readable labels
+* **Categories**: Filter by binding categories (Flight, Combat, Navigation, etc.)
+* **VoiceAttack Integration**: Copy VoiceAttack variable names for voice command integration
+* **Export**: Save filtered results or complete binding lists
+
+### Finding Your Bindings File
+
+Elite Dangerous stores binding files in:
+```
+%LOCALAPPDATA%\Frontier Developments\Elite Dangerous\Options\Bindings\
+```
+
+Common binding files:
+- `Custom.3.0.binds` - Your custom bindings
+- `Keyboard.binds` - Default keyboard layout  
+- `GamePad.binds` - Default gamepad layout
+
 ## Device Mapping Files
 
 1. The device mapping files are found in the `DeviceMappings` folder

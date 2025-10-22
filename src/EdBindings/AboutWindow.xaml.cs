@@ -1,3 +1,7 @@
+// <copyright file="AboutWindow.xaml.cs" company="Elite Dangerous Community">
+// Copyright (c) Elite Dangerous Community. All rights reserved.
+// </copyright>
+
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -45,6 +49,7 @@ namespace EdBindings;
                 VersionString = "Unknown Version";
             }
         }
+
         /// <summary>
         /// Closes the button click.
         /// </summary>

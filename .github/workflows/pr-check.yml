@@ -23,12 +23,12 @@ jobs:
     name: 🛡️ Security Scan
     runs-on: windows-latest
     if: github.event.pull_request.draft == false
-    
+
     permissions:
       security-events: write
       contents: read
       pull-requests: read
-    
+
     steps:
     - name: 📥 Checkout code
       uses: actions/checkout@v4
@@ -81,12 +81,12 @@ jobs:
     name: 📊 Code Quality
     runs-on: windows-latest
     if: github.event.pull_request.draft == false
-    
+
     permissions:
       contents: read
       pull-requests: write
       checks: write
-    
+
     steps:
     - name: 📥 Checkout code
       uses: actions/checkout@v4
@@ -131,10 +131,7 @@ jobs:
     - name: 🏗️ Build solution
       run: |
         Write-Host "::group::Build Solution"
-        dotnet build --configuration Release --no-restore --verbosity normal `
-          --property:TreatWarningsAsErrors=true `
-          --property:WarningsAsErrors="" `
-          --property:WarningsNotAsErrors="CS1591"
+        dotnet build --configuration Release --no-restore --verbosity normal --property:TreatWarningsAsErrors=true --property:WarningsAsErrors= --property:WarningsNotAsErrors=CS1591
         Write-Host "::endgroup::"
 
     - name: 🧪 Run unit tests with coverage
@@ -202,11 +199,11 @@ jobs:
     name: ⚡ Performance Check
     runs-on: windows-latest
     if: github.event.pull_request.draft == false
-    
+
     permissions:
       contents: read
       pull-requests: write
-    
+
     steps:
     - name: 📥 Checkout code
       uses: actions/checkout@v4
@@ -232,10 +229,10 @@ jobs:
         if (Test-Path $binPath) {
           $exeSize = (Get-Item "$binPath/EdBindings.exe").Length
           $totalSize = (Get-ChildItem $binPath -Recurse | Measure-Object -Property Length -Sum).Sum
-          
+
           Write-Host "::notice::Binary size: $([math]::Round($exeSize/1MB, 2)) MB"
           Write-Host "::notice::Total output size: $([math]::Round($totalSize/1MB, 2)) MB"
-          
+
           # Warn if binary is unusually large
           if ($exeSize -gt 50MB) {
             Write-Host "::warning::Binary size is quite large ($([math]::Round($exeSize/1MB, 2)) MB). Consider investigating."
@@ -248,17 +245,17 @@ jobs:
         Write-Host "::group::Static Analysis"
         # Check for potential memory leaks in code patterns
         $codeIssues = @()
-        
+
         # Check for event handlers without unsubscription
         $eventHandlers = Select-String -Path "src/**/*.cs" -Pattern "\..*\+=" -AllMatches
         if ($eventHandlers.Count -gt 0) {
           Write-Host "::notice::Found $($eventHandlers.Count) event subscriptions. Ensure proper cleanup."
         }
-        
+
         # Check for IDisposable implementations
         $disposables = Select-String -Path "src/**/*.cs" -Pattern "class.*:.*IDisposable" -AllMatches
         Write-Host "::notice::Found $($disposables.Count) IDisposable implementations."
-        
+
         Write-Host "::endgroup::"
 
   # Documentation and changelog check
@@ -266,11 +263,11 @@ jobs:
     name: 📚 Documentation Check
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
-    
+
     permissions:
       contents: read
       pull-requests: write
-    
+
     steps:
     - name: 📥 Checkout code
       uses: actions/checkout@v4
@@ -281,25 +278,25 @@ jobs:
     - name: 🔍 Check for documentation updates
       run: |
         echo "::group::Documentation Analysis"
-        
+
         # Check if code changes require documentation updates
         changed_files=$(git diff --name-only origin/main...HEAD)
         code_changes=$(echo "$changed_files" | grep -E '\.(cs|xaml)$' | wc -l)
         doc_changes=$(echo "$changed_files" | grep -E '\.(md|txt)$' | wc -l)
-        
+
         echo "Code files changed: $code_changes"
         echo "Documentation files changed: $doc_changes"
-        
+
         if [ "$code_changes" -gt 5 ] && [ "$doc_changes" -eq 0 ]; then
           echo "::warning::Significant code changes detected without documentation updates. Consider updating README.md or adding release notes."
         fi
-        
+
         # Check README.md exists and is not empty
         if [ ! -f "README.md" ] || [ ! -s "README.md" ]; then
           echo "::error::README.md is missing or empty"
           exit 1
         fi
-        
+
         echo "::endgroup::"
 
     - name: 📝 Spell check documentation
@@ -311,32 +308,32 @@ jobs:
     runs-on: ubuntu-latest
     needs: [security-scan, code-quality, performance-check, documentation-check]
     if: always() && github.event.pull_request.draft == false
-    
+
     permissions:
       contents: read
       pull-requests: write
-    
+
     steps:
     - name: 📊 Evaluate PR quality
       run: |
         echo "::group::PR Validation Results"
-        
+
         security_result="${{ needs.security-scan.result }}"
         quality_result="${{ needs.code-quality.result }}"
         performance_result="${{ needs.performance-check.result }}"
         docs_result="${{ needs.documentation-check.result }}"
-        
+
         echo "Security Scan: $security_result"
         echo "Code Quality: $quality_result"
         echo "Performance Check: $performance_result"
         echo "Documentation Check: $docs_result"
-        
+
         failed_checks=0
         if [ "$security_result" != "success" ]; then failed_checks=$((failed_checks + 1)); fi
         if [ "$quality_result" != "success" ]; then failed_checks=$((failed_checks + 1)); fi
         if [ "$performance_result" != "success" ]; then failed_checks=$((failed_checks + 1)); fi
         if [ "$docs_result" != "success" ]; then failed_checks=$((failed_checks + 1)); fi
-        
+
         if [ $failed_checks -eq 0 ]; then
           echo "::notice::✅ All PR checks passed! Ready for review."
         elif [ $failed_checks -eq 1 ]; then
@@ -344,7 +341,7 @@ jobs:
         else
           echo "::error::❌ $failed_checks checks failed. Please address issues before review."
         fi
-        
+
         echo "::endgroup::"
 
     - name: 🎯 PR readiness check

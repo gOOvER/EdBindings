@@ -1,8 +1,12 @@
-namespace EdBindings.Model.BindingsRaw.Bindings
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Xml.Linq;
+// <copyright file="BindingGroup.cs" company="Elite Dangerous Community">
+// Copyright (c) Elite Dangerous Community. All rights reserved.
+// </copyright>
+
+using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
+
+namespace EdBindings.Model.BindingsRaw.Bindings;
 
     /// <summary>
     /// Record BindingGroup.
@@ -26,4 +30,3 @@ namespace EdBindings.Model.BindingsRaw.Bindings
                 Bindings: element.Descendants().Select(element => MakeBinding(element)).Where(b => b != null).ToList()!);
         }
     }
-}

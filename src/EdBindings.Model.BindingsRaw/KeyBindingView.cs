@@ -1,10 +1,14 @@
-namespace EdBindings.Model
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Linq;
-    using EdBindings.Model.BindingsRaw.Bindings;
+// <copyright file="KeyBindingView.cs" company="Elite Dangerous Community">
+// Copyright (c) Elite Dangerous Community. All rights reserved.
+// </copyright>
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using EdBindings.Model.BindingsRaw.Bindings;
+
+namespace EdBindings.Model;
 
     /// <summary>
     /// Class KeyBindingView.
@@ -101,7 +105,4 @@ namespace EdBindings.Model
 
             return view;
         }
-
-
     }
-}

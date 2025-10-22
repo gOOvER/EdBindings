@@ -1,7 +1,11 @@
-namespace EdBindings.Model.BindingsRaw.Bindings
-{
-    using System.Linq;
-    using System.Xml.Linq;
+// <copyright file="BindingDeviceValue.cs" company="Elite Dangerous Community">
+// Copyright (c) Elite Dangerous Community. All rights reserved.
+// </copyright>
+
+using System.Linq;
+using System.Xml.Linq;
+
+namespace EdBindings.Model.BindingsRaw.Bindings;
 
     /// <summary>
     /// Record BindingDevice.
@@ -26,4 +30,3 @@ namespace EdBindings.Model.BindingsRaw.Bindings
                 Key: element.Attribute("Key")?.Value ?? "");
         }
     }
-}

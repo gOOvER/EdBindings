@@ -1,13 +1,15 @@
 [files]
 extend-exclude = [
     "*.json",
-    "*.xml", 
+    "*.xml",
     "*.csproj",
     "*.sln",
     "*.yml",
     "*.yaml",
     "*.cs",
     "*.xaml",
+    "*.vdproj",
+    "*.binds",
     "typos.toml",
     "bin/**",
     "obj/**",
@@ -19,7 +21,7 @@ extend-exclude = [
 [default.extend-words]
 EdBindings = "EdBindings"
 HOTAS = "HOTAS"
-keybinding = "keybinding" 
+keybinding = "keybinding"
 keybindings = "keybindings"
 gameplay = "gameplay"
 VoiceAttack = "VoiceAttack"
@@ -35,3 +37,11 @@ NSIS = "NSIS"
 Chocolatey = "Chocolatey"
 vdproj = "vdproj"
 MSBuild = "MSBuild"
+searchable = "searchable"
+codecov = "codecov"
+dropdown = "dropdown"
+gamepad = "gamepad"
+JSON = "JSON"
+json = "json"
+Golubev = "Golubev"
+flaticon = "flaticon"

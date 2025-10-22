@@ -1,11 +1,15 @@
-namespace EdBindings.Model
-{
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using EdBindings.Model.BindingsRaw.Bindings;
-    using Newtonsoft.Json;
+// <copyright file="DeviceMap.cs" company="Elite Dangerous Community">
+// Copyright (c) Elite Dangerous Community. All rights reserved.
+// </copyright>
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using EdBindings.Model.BindingsRaw.Bindings;
+using Newtonsoft.Json;
+
+namespace EdBindings.Model;
 
     /// <summary>
     /// Class DeviceMap.
@@ -52,4 +56,3 @@ namespace EdBindings.Model
             return JsonConvert.DeserializeObject<DeviceMap>(json) ?? new DeviceMap();
         }
     }
-}
