@@ -8,7 +8,8 @@
            Manufacturer="Elite Dangerous Community"
            UpgradeCode="{12345678-1234-1234-1234-123456789012}"
            InstallerVersion="500" 
-           Compressed="yes">
+           Compressed="yes"
+           Scope="perMachine">
 
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
     <MediaTemplate EmbedCab="yes" />
@@ -27,23 +28,26 @@
     <!-- Components -->
     <DirectoryRef Id="INSTALLFOLDER">
       <Component Id="MainApplication" Guid="{87654321-4321-4321-4321-210987654321}">
-        <File Id="EdBindingsExe" Source="$(var.SourceDir)\EdBindings.exe" />
-        <File Id="EdBindingsConfig" Source="$(var.SourceDir)\EdBindings.dll.config" />
+        <File Id="EdBindingsExe" Source="$(var.SourceDir)\EdBindings.exe" KeyPath="yes">
+          <Shortcut Id="StartMenuShortcut" Directory="ProgramMenuFolder" Name="EdBindings" 
+                    WorkingDirectory="INSTALLFOLDER" 
+                    Description="Elite Dangerous Key Binding Viewer" />
+          <Shortcut Id="DesktopShortcut" Directory="DesktopFolder" Name="EdBindings"
+                    WorkingDirectory="INSTALLFOLDER"
+                    Description="Elite Dangerous Key Binding Viewer" />
+        </File>
         <File Id="EdBindingsDll" Source="$(var.SourceDir)\EdBindings.dll" />
         <File Id="EdBindingsModelDll" Source="$(var.SourceDir)\EdBindings.Model.dll" />
-        <File Id="EdBindingsPdb" Source="$(var.SourceDir)\EdBindings.pdb" />
-        <File Id="EdBindingsModelPdb" Source="$(var.SourceDir)\EdBindings.Model.pdb" />
         <File Id="EdBindingsRuntimeConfig" Source="$(var.SourceDir)\EdBindings.runtimeconfig.json" />
         <File Id="EdBindingsDeps" Source="$(var.SourceDir)\EdBindings.deps.json" />
         <File Id="ActionMappingsJson" Source="$(var.SourceDir)\ActionMappings.json" />
-      </Component>
-
-      <!-- WPF Runtime Files -->
-      <Component Id="WpfRuntimeFiles" Guid="{11111111-2222-3333-4444-555555555555}">
-        <File Id="MicrosoftWin32SystemEventsFile" Source="$(var.SourceDir)\Microsoft.Win32.SystemEvents.dll" />
-        <File Id="SystemDrawingCommonFile" Source="$(var.SourceDir)\System.Drawing.Common.dll" />
-        <File Id="SystemSecurityPermissionsFile" Source="$(var.SourceDir)\System.Security.Permissions.dll" />
-        <File Id="SystemWindowsExtensionsFile" Source="$(var.SourceDir)\System.Windows.Extensions.dll" />
+        <File Id="NewtonsoftJson" Source="$(var.SourceDir)\Newtonsoft.Json.dll" />
+        
+        <!-- Registry entry for proper uninstallation -->
+        <RegistryValue Root="HKCU" Key="Software\Microsoft\EdBindings" Name="installed" Type="integer" Value="1" />
+        
+        <!-- Remove shortcuts on uninstall -->
+        <RemoveFolder Id="RemoveProgramMenuFolder" Directory="ProgramMenuFolder" On="uninstall" />
       </Component>
     </DirectoryRef>
 
@@ -53,36 +57,10 @@
       </Component>
     </DirectoryRef>
 
-    <!-- Start Menu Shortcut -->
-    <StandardDirectory Id="ProgramMenuFolder">
-      <Component Id="StartMenuShortcut" Guid="{33333333-4444-5555-6666-777777777777}">
-        <Shortcut Id="EdBindingsStartMenuShortcut"
-                  Name="EdBindings"
-                  Target="[INSTALLFOLDER]EdBindings.exe"
-                  WorkingDirectory="INSTALLFOLDER" />
-        <RemoveFolder Id="RemoveStartMenuFolder" On="uninstall" />
-        <RegistryValue Root="HKCU" Key="Software\EdBindings" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
-      </Component>
-    </StandardDirectory>
-
-    <!-- Desktop Shortcut -->
-    <StandardDirectory Id="DesktopFolder">
-      <Component Id="DesktopShortcut" Guid="{44444444-5555-6666-7777-888888888888}">
-        <Shortcut Id="EdBindingsDesktopShortcut"
-                  Name="EdBindings"
-                  Target="[INSTALLFOLDER]EdBindings.exe"
-                  WorkingDirectory="INSTALLFOLDER" />
-        <RegistryValue Root="HKCU" Key="Software\EdBindings" Name="desktopShortcut" Type="integer" Value="1" KeyPath="yes"/>
-      </Component>
-    </StandardDirectory>
-
     <!-- Feature -->
-    <Feature Id="Complete" Title="EdBindings" Level="1">
+    <Feature Id="Complete" Title="EdBindings - Elite Dangerous Key Binding Viewer" Level="1">
       <ComponentRef Id="MainApplication" />
-      <ComponentRef Id="WpfRuntimeFiles" />
       <ComponentRef Id="DeviceMappings" />
-      <ComponentRef Id="StartMenuShortcut" />
-      <ComponentRef Id="DesktopShortcut" />
     </Feature>
     
     <!-- Branding -->

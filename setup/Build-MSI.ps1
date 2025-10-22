@@ -6,7 +6,9 @@ param(
     [string]$OutputPath,
     
     [string]$Version = "1.0.0",
-    [string]$ProductName = "EdBindings"
+    [string]$ProductName = "EdBindings",
+    [switch]$UseWorkingWxs,
+    [switch]$UseSimpleWxs = $false
 )
 
 # Normalize version for MSI compatibility (WiX requires x.y.z.w format)
@@ -83,8 +85,12 @@ Alternative: Use Visual Studio with Installer Projects extension
 }
 
 try {
-    # Use appropriate .wxs file based on WiX version
-    $wxsFile = if ($wixFound -and $wixVersion -match "6\.") {
+    # Use appropriate .wxs file based on WiX version or user preference
+    $wxsFile = if ($UseSimpleWxs) {
+        Join-Path $PSScriptRoot "EdBindings-simple.wxs"
+    } elseif ($UseWorkingWxs) {
+        Join-Path $PSScriptRoot "EdBindings-working.wxs"
+    } elseif ($wixFound -and $wixVersion -match "6\.") {
         Join-Path $PSScriptRoot "EdBindings-v6.wxs"
     } elseif ($wixFound -and $wixVersion -match "5\.") {
         Join-Path $PSScriptRoot "EdBindings-v5.wxs"
