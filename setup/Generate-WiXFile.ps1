@@ -21,16 +21,16 @@ Write-Host "📋 Found $($allFiles.Count) files to include" -ForegroundColor Yel
 $wxsContent = @"
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Package Id="EdBindingsPackage" 
-           Name="Elite Dangerous Bindings Viewer" 
-           Language="1033" 
-           Version="`$(var.Version)" 
-           Manufacturer="Elite Dangerous Tools" 
+  <Package Id="EdBindingsPackage"
+           Name="Elite Dangerous Bindings Viewer"
+           Language="1033"
+           Version="`$(var.Version)"
+           Manufacturer="Elite Dangerous Tools"
            UpgradeCode="12345678-1234-1234-1234-123456789012">
 
     <MajorUpgrade DowngradeErrorMessage="A newer version is already installed." />
     <MediaTemplate EmbedCab="yes" />
-    
+
     <!-- Icon Definition -->
     <Icon Id="EdBindings.exe" SourceFile="`$(var.SourceDir)/EdBindings.exe" />
 
@@ -52,24 +52,24 @@ $wxsContent = @"
     <DirectoryRef Id="INSTALLFOLDER">
       <!-- Main executable -->
       <Component Id="MainExecutable" Guid="12345678-9ABC-DEF0-1234-56789ABCDEF0">
-        <File Id="MainExe" 
-              Source="`$(var.SourceDir)/EdBindings.exe" 
+        <File Id="MainExe"
+              Source="`$(var.SourceDir)/EdBindings.exe"
               KeyPath="yes">
-          <Shortcut Id="DesktopShortcut" 
-                    Directory="DesktopFolder" 
-                    Name="Elite Dangerous Bindings Viewer" 
-                    WorkingDirectory="INSTALLFOLDER" 
-                    Icon="EdBindings.exe" 
+          <Shortcut Id="DesktopShortcut"
+                    Directory="DesktopFolder"
+                    Name="Elite Dangerous Bindings Viewer"
+                    WorkingDirectory="INSTALLFOLDER"
+                    Icon="EdBindings.exe"
                     IconIndex="0" />
-          <Shortcut Id="StartMenuShortcut" 
-                    Directory="ProgramMenuFolder" 
-                    Name="Elite Dangerous Bindings Viewer" 
-                    WorkingDirectory="INSTALLFOLDER" 
-                    Icon="EdBindings.exe" 
+          <Shortcut Id="StartMenuShortcut"
+                    Directory="ProgramMenuFolder"
+                    Name="Elite Dangerous Bindings Viewer"
+                    WorkingDirectory="INSTALLFOLDER"
+                    Icon="EdBindings.exe"
                     IconIndex="0" />
         </File>
       </Component>
-      
+
       <!-- All other files -->
       <Component Id="AllApplicationFiles" Guid="11111111-2222-3333-4444-555555555555">
 "@
@@ -85,7 +85,7 @@ foreach ($file in $allFiles) {
         # X56.json wird separat behandelt
         continue
     }
-    
+
     # Erstelle relativen Pfad von der Basis des Source-Verzeichnisses
     $relativePath = $file.FullName.Substring($sourceItem.FullName.Length)
     if ($relativePath.StartsWith('\')) {
@@ -95,17 +95,17 @@ foreach ($file in $allFiles) {
     $relativePath = $relativePath -replace '\\', '/'
     $fileName = $file.Name
     $safeId = "File_" + ($fileName -replace '[^A-Za-z0-9_.]', '_') + "_$componentId"
-    
+
     # Stelle sicher, dass IDs nicht zu lang werden
     if ($safeId.Length -gt 50) {
         $safeId = "File_$componentId"
     }
-    
+
     $wxsContent += @"
-        <File Id="$safeId" 
+        <File Id="$safeId"
               Source="`$(var.SourceDir)/$relativePath" />
 "@
-    
+
     $componentId++
 }
 
@@ -116,8 +116,8 @@ $wxsContent += @"
     <!-- Device Mappings Component -->
     <DirectoryRef Id="DeviceMappingsFolder">
       <Component Id="DeviceMappingsFiles" Guid="22222222-3333-4444-5555-666666666666">
-        <File Id="X56JsonFile" 
-              Source="`$(var.SourceDir)/DeviceMappings/X56.json" 
+        <File Id="X56JsonFile"
+              Source="`$(var.SourceDir)/DeviceMappings/X56.json"
               KeyPath="yes" />
       </Component>
     </DirectoryRef>
