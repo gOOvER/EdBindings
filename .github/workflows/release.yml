@@ -77,20 +77,20 @@ jobs:
       run: |
         # Install WiX Toolset v3.14 (latest stable)
         Write-Host "🔽 Installing WiX Toolset..." -ForegroundColor Cyan
-        $wixUrl = "https://github.com/wixtoolset/wix3/releases/download/wix314rtm/wix314.exe"
+        $wixUrl = "https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314.exe"
         $wixInstaller = "wix314.exe"
-        
+
         Invoke-WebRequest -Uri $wixUrl -OutFile $wixInstaller
         Write-Host "📦 Running WiX installer..." -ForegroundColor Cyan
         Start-Process -FilePath $wixInstaller -ArgumentList "/quiet" -Wait
-        
+
         # Add WiX to PATH (check multiple possible locations)
         $possiblePaths = @(
           "${env:ProgramFiles(x86)}\WiX Toolset v3.14\bin",
           "${env:ProgramFiles}\WiX Toolset v3.14\bin",
           "${env:ProgramFiles(x86)}\WiX Toolset v3.11\bin"
         )
-        
+
         $wixPath = $null
         foreach ($path in $possiblePaths) {
           if (Test-Path "$path\candle.exe") {
@@ -99,21 +99,21 @@ jobs:
             break
           }
         }
-        
+
         if (-not $wixPath) {
           Write-Host "❌ WiX installation failed or not found" -ForegroundColor Red
           throw "WiX Toolset installation failed"
         }
-        
+
         # Add WiX to PATH for current session
         $env:PATH = "$wixPath;$env:PATH"
         Write-Host "📝 Added WiX to PATH: $wixPath" -ForegroundColor Cyan
-        
-        # Create MSI using PowerShell script  
+
+        # Create MSI using PowerShell script
         Write-Host "🏗️ Building MSI installer..." -ForegroundColor Green
         $version = "${{ steps.version.outputs.VERSION }}"
         Write-Host "Building MSI for version: $version" -ForegroundColor Cyan
-        
+
         # Verify WiX is accessible
         try {
           $candleVersion = & candle.exe -? 2>&1 | Select-Object -First 1
@@ -121,56 +121,56 @@ jobs:
         } catch {
           Write-Host "⚠️ WiX Candle not accessible, MSI build will create instructions only" -ForegroundColor Yellow
         }
-        
+
         $buildSuccess = & .\setup\Build-MSI.ps1 -SourcePath "./publish/win-x64" -OutputPath "./publish" -Version $version
-        
+
         if (-not $buildSuccess) {
           Write-Host "ℹ️ MSI build requires manual steps - check BUILD_INSTRUCTIONS.txt in release" -ForegroundColor Yellow
         }
-        
+
         # Fallback: Create detailed build guide if MSI build fails
         if (-not $buildSuccess -or -not (Test-Path "./publish/EdBindings-*.msi")) {
           Write-Host "⚠️ MSI build not completed, creating comprehensive build guide..." -ForegroundColor Yellow
-          
+
           $buildGuide = @"
         # 🔨 EdBindings MSI Build Guide
-        
+
         ## Quick Start
         The automated MSI build requires WiX Toolset. Choose your preferred method:
-        
+
         ### Method 1: WiX Toolset (Automated)
         ``````powershell
         # Run the automated build script
         .\setup\Build-MSI.ps1 -SourcePath "./publish/win-x64" -OutputPath "./publish" -Version $env:VERSION
         ``````
-        
-        ### Method 2: Visual Studio (Manual) 
+
+        ### Method 2: Visual Studio (Manual)
         1. Open ``setup/EDBindingsSetup/EDBindingsSetup.vdproj`` in Visual Studio 2022
         2. Install "Microsoft Visual Studio Installer Projects" extension if prompted
         3. Build → Build Solution (Ctrl+Shift+B)
         4. MSI will be generated in ``setup/EDBindingsSetup/Release/``
-        
+
         ### Method 3: Alternative Installers
         - **NSIS**: Lightweight, script-based installer
-        - **Inno Setup**: Free, professional-looking installers  
+        - **Inno Setup**: Free, professional-looking installers
         - **Advanced Installer**: Commercial with GUI builder
         - **Squirrel.Windows**: Modern .NET updater framework
-        
+
         ## Files Included
         - 📁 **Published Application**: ``./publish/win-x64/`` (Ready for packaging)
         - 📄 **WiX Source**: ``setup/EdBindings.wxs`` (MSI definition)
         - 🔧 **Build Script**: ``setup/Build-MSI.ps1`` (Automation helper)
         - 📋 **Legacy Project**: ``setup/EDBindingsSetup/`` (Visual Studio project)
-        
+
         ## Distribution Options
         1. **ZIP Release**: ``EdBindings-win-x64.zip`` (Available now)
         2. **MSI Installer**: Create using methods above
         3. **Chocolatey**: Package for ``choco install`` distribution
         4. **Portable**: Single executable with dependencies
-        
+
         > 💡 **Tip**: For immediate distribution, use the ZIP releases. MSI provides better Windows integration and uninstall support.
         "@
-          
+
           Set-Content -Path "./publish/MSI_BUILD_GUIDE.md" -Value $buildGuide
           Write-Host "📖 Created comprehensive MSI build guide" -ForegroundColor Green
         }
@@ -186,12 +186,12 @@ jobs:
       run: |
         $version = "${{ steps.version.outputs.VERSION }}"
         $isPrerelease = "${{ github.event_name == 'workflow_dispatch' && github.event.inputs.prerelease == 'true' || contains(steps.version.outputs.VERSION, '-') }}"
-        
+
         $releaseType = ""
         if ($isPrerelease -eq "true") {
           $releaseType = "`n> **⚠️ This is a pre-release version** - Use with caution and please report any issues.`n"
         }
-        
+
         $notes = @"
         ## EdBindings $version
         $releaseType

@@ -82,18 +82,56 @@ try {
     $objFile = Join-Path $OutputPath "EdBindings.wixobj"
     $msiFile = Join-Path $OutputPath "$ProductName-$Version.msi"
     
+    # Validate inputs
+    Write-Host "🔍 Validating build environment..." -ForegroundColor Cyan
+    Write-Host "WXS File: $wxsFile" -ForegroundColor Gray
+    Write-Host "Source Path: $SourcePath" -ForegroundColor Gray
+    Write-Host "Output Path: $OutputPath" -ForegroundColor Gray
+    
+    if (-not (Test-Path $wxsFile)) {
+        Write-Host "❌ WiX source file not found: $wxsFile" -ForegroundColor Red
+        return $false
+    }
+    
+    if (-not (Test-Path $SourcePath)) {
+        Write-Host "❌ Source directory not found: $SourcePath" -ForegroundColor Red
+        return $false
+    }
+    
+    # Check for main executable
+    $mainExe = Join-Path $SourcePath "EdBindings.exe"
+    if (-not (Test-Path $mainExe)) {
+        Write-Host "❌ Main executable not found: $mainExe" -ForegroundColor Red
+        Write-Host "📁 Available files in source directory:" -ForegroundColor Yellow
+        Get-ChildItem $SourcePath -File | ForEach-Object { Write-Host "   $($_.Name)" -ForegroundColor Gray }
+        return $false
+    }
+    
+    Write-Host "✅ All required files found" -ForegroundColor Green
+    
     Write-Host "Compiling WiX source..." -ForegroundColor Cyan
     Write-Host "Using normalized version: $NormalizedVersion" -ForegroundColor Yellow
-    & candle.exe $wxsFile -dSourceDir="$SourcePath" -dVersion="$NormalizedVersion" -o $objFile
+    Write-Host "Command: candle.exe `"$wxsFile`" -dSourceDir=`"$SourcePath`" -dVersion=`"$NormalizedVersion`" -o `"$objFile`"" -ForegroundColor Gray
+    
+    $candleResult = & candle.exe $wxsFile -dSourceDir="$SourcePath" -dVersion="$NormalizedVersion" -o $objFile 2>&1
+    Write-Host "Candle output: $candleResult" -ForegroundColor Gray
     
     if ($LASTEXITCODE -eq 0) {
+        Write-Host "✅ Compilation successful" -ForegroundColor Green
         Write-Host "Linking MSI..." -ForegroundColor Cyan
-        & light.exe $objFile -o $msiFile -ext WixUIExtension
+        Write-Host "Command: light.exe `"$objFile`" -o `"$msiFile`" -ext WixUIExtension" -ForegroundColor Gray
+        
+        $lightResult = & light.exe $objFile -o $msiFile -ext WixUIExtension 2>&1
+        Write-Host "Light output: $lightResult" -ForegroundColor Gray
         
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "MSI created: $msiFile" -ForegroundColor Green
+            Write-Host "✅ MSI created: $msiFile" -ForegroundColor Green
             return $true
+        } else {
+            Write-Host "❌ Light.exe failed with exit code: $LASTEXITCODE" -ForegroundColor Red
         }
+    } else {
+        Write-Host "❌ Candle.exe failed with exit code: $LASTEXITCODE" -ForegroundColor Red
     }
     
     Write-Host "MSI build failed" -ForegroundColor Red
