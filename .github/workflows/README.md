@@ -126,7 +126,7 @@ The following workflows were consolidated into CodeRabbit:
 
 1. **CodeRabbit Reviews Missing**: Ensure `OPENAI_API_KEY` is set in repository secrets
 
-2. **MSI Build Fails**: WiX Toolset v6 is used - check setup/Build-MSI.ps1 for details
+2. **MSI Build Fails**: Ensure WiX Toolset v6.0.2 is correctly installed and setup/EdBindings.wxs is valid
 
 3. **Tests Fail**: All tests must pass locally before pushing. CI treats warnings as errors.
 

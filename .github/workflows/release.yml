@@ -83,25 +83,10 @@ jobs:
         Write-Host "✅ WiX v6 installed successfully" -ForegroundColor Green
         wix --version
         
-        # Create MSI using PowerShell script with WiX v5
-        Write-Host "🏗️ Building MSI installer..." -ForegroundColor Green
-        $version = "${{ steps.version.outputs.VERSION }}"
-        Write-Host "Building MSI for version: $version" -ForegroundColor Cyan
-        $buildSuccess = & .\setup\Build-MSI.ps1 -SourcePath "./publish/win-x64" -OutputPath "./publish" -Version $version
-
         # Create MSI using PowerShell script
         Write-Host "🏗️ Building MSI installer..." -ForegroundColor Green
         $version = "${{ steps.version.outputs.VERSION }}"
         Write-Host "Building MSI for version: $version" -ForegroundColor Cyan
-
-        # Verify WiX is accessible
-        try {
-          $candleVersion = & candle.exe -? 2>&1 | Select-Object -First 1
-          Write-Host "✅ WiX Candle accessible: $candleVersion" -ForegroundColor Green
-        } catch {
-          Write-Host "⚠️ WiX Candle not accessible, MSI build will create instructions only" -ForegroundColor Yellow
-        }
-
         $buildSuccess = & .\setup\Build-MSI.ps1 -SourcePath "./publish/win-x64" -OutputPath "./publish" -Version $version
 
         if (-not $buildSuccess) {
@@ -124,10 +109,9 @@ jobs:
         .\setup\Build-MSI.ps1 -SourcePath "./publish/win-x64" -OutputPath "./publish" -Version $env:VERSION
         ``````
 
-        ### Method 2: Visual Studio (Manual)
-        1. Open ``setup/EDBindingsSetup/EDBindingsSetup.vdproj`` in Visual Studio 2022
-        2. Install "Microsoft Visual Studio Installer Projects" extension if prompted
-        3. Build → Build Solution (Ctrl+Shift+B)
+        ### Method 2: Manual WiX Build
+        1. Install WiX Toolset v6.0.2: ``dotnet tool install --global wix --version 6.0.2``
+        2. Run: ``wix build setup/EdBindings.wxs -d SourceDir="./publish/win-x64" -d Version="$env:VERSION" -o "./publish/EdBindings-$env:VERSION.msi"``
         4. MSI will be generated in ``setup/EDBindingsSetup/Release/``
 
         ### Method 3: Alternative Installers
@@ -144,11 +128,8 @@ jobs:
 
         ## Files Included
         - 📁 **Published Application**: ``./publish/win-x64/`` (Ready for packaging)
-        - 📄 **WiX v6 Source**: ``setup/EdBindings-v6.wxs`` (Current format)
-        - 📄 **WiX v5 Source**: ``setup/EdBindings-v5.wxs`` (Fallback)
-        - 📄 **WiX v3 Source**: ``setup/EdBindings.wxs`` (Legacy format)
-        - 🔧 **Build Script**: ``setup/Build-MSI.ps1`` (Auto-detects WiX version)
-        - 📋 **Legacy Project**: ``setup/EDBindingsSetup/`` (Visual Studio project)
+        - 📄 **WiX v6 Source**: ``setup/EdBindings.wxs`` (Current format)
+        -  **Build Script**: ``setup/Build-MSI.ps1`` (WiX v6.0.2)
 
         ## Distribution Options
         1. **ZIP Release**: ``EdBindings-win-x64.zip`` (Available now)
