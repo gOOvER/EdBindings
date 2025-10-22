@@ -9,7 +9,7 @@ public class BindFileTests
     [Fact]
     public void TestProcessingBindingFile()
     {
-        var path = @".\Custom.4.0.binds";
+        var path = @".\Custom.4.2.binds";
 
         var bindingFile = BindingFile.Open(path);
 
