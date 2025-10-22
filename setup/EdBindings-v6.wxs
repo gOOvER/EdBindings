@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Package Id="EdBindings" 
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+  <Package Id="*" 
            Name="EdBindings" 
            Language="1033" 
            Version="$(var.Version)" 
            Manufacturer="Elite Dangerous Community"
+           UpgradeCode="{12345678-1234-1234-1234-123456789012}"
            InstallerVersion="500" 
            Compressed="yes">
 
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
     <MediaTemplate EmbedCab="yes" />
+
+    <!-- UI -->
+    <ui:WixUI Id="WixUI_InstallDir" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
 
     <!-- Installation directory -->
     <StandardDirectory Id="ProgramFilesFolder">
@@ -18,34 +24,65 @@
       </Directory>
     </StandardDirectory>
 
-    <!-- Feature with explicit file components -->
+    <!-- Components -->
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Component Id="MainApplication" Guid="{87654321-4321-4321-4321-210987654321}">
+        <File Id="EdBindingsExe" Source="$(var.SourceDir)\EdBindings.exe" />
+        <File Id="EdBindingsConfig" Source="$(var.SourceDir)\EdBindings.dll.config" />
+        <File Id="EdBindingsDll" Source="$(var.SourceDir)\EdBindings.dll" />
+        <File Id="EdBindingsModelDll" Source="$(var.SourceDir)\EdBindings.Model.dll" />
+        <File Id="EdBindingsPdb" Source="$(var.SourceDir)\EdBindings.pdb" />
+        <File Id="EdBindingsModelPdb" Source="$(var.SourceDir)\EdBindings.Model.pdb" />
+        <File Id="EdBindingsRuntimeConfig" Source="$(var.SourceDir)\EdBindings.runtimeconfig.json" />
+        <File Id="EdBindingsDeps" Source="$(var.SourceDir)\EdBindings.deps.json" />
+        <File Id="ActionMappingsJson" Source="$(var.SourceDir)\ActionMappings.json" />
+      </Component>
+
+      <!-- WPF Runtime Files -->
+      <Component Id="WpfRuntimeFiles" Guid="{11111111-2222-3333-4444-555555555555}">
+        <File Id="MicrosoftWin32SystemEventsFile" Source="$(var.SourceDir)\Microsoft.Win32.SystemEvents.dll" />
+        <File Id="SystemDrawingCommonFile" Source="$(var.SourceDir)\System.Drawing.Common.dll" />
+        <File Id="SystemSecurityPermissionsFile" Source="$(var.SourceDir)\System.Security.Permissions.dll" />
+        <File Id="SystemWindowsExtensionsFile" Source="$(var.SourceDir)\System.Windows.Extensions.dll" />
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="DeviceMappingsFolder">
+      <Component Id="DeviceMappings" Guid="{22222222-3333-4444-5555-666666666666}">
+        <File Id="X56Json" Source="$(var.SourceDir)\DeviceMappings\X56.json" />
+      </Component>
+    </DirectoryRef>
+
+    <!-- Start Menu Shortcut -->
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Component Id="StartMenuShortcut" Guid="{33333333-4444-5555-6666-777777777777}">
+        <Shortcut Id="EdBindingsStartMenuShortcut"
+                  Name="EdBindings"
+                  Target="[INSTALLFOLDER]EdBindings.exe"
+                  WorkingDirectory="INSTALLFOLDER" />
+        <RemoveFolder Id="RemoveStartMenuFolder" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\EdBindings" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </StandardDirectory>
+
+    <!-- Desktop Shortcut -->
+    <StandardDirectory Id="DesktopFolder">
+      <Component Id="DesktopShortcut" Guid="{44444444-5555-6666-7777-888888888888}">
+        <Shortcut Id="EdBindingsDesktopShortcut"
+                  Name="EdBindings"
+                  Target="[INSTALLFOLDER]EdBindings.exe"
+                  WorkingDirectory="INSTALLFOLDER" />
+        <RegistryValue Root="HKCU" Key="Software\EdBindings" Name="desktopShortcut" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </StandardDirectory>
+
+    <!-- Feature -->
     <Feature Id="Complete" Title="EdBindings" Level="1">
-      <Component Id="MainExe" Directory="INSTALLFOLDER" Guid="{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}">
-        <File Id="EdBindings.exe" Source="$(var.SourceDir)\EdBindings.exe" KeyPath="yes" />
-      </Component>
-      
-      <Component Id="MainDll" Directory="INSTALLFOLDER" Guid="{B2C3D4E5-F6A7-8901-BCDE-F12345678901}">
-        <File Id="EdBindings.dll" Source="$(var.SourceDir)\EdBindings.dll" KeyPath="yes" />
-      </Component>
-      
-      <Component Id="ModelDll" Directory="INSTALLFOLDER" Guid="{C3D4E5F6-A7B8-9012-CDEF-123456789012}">
-        <File Id="EdBindings.Model.dll" Source="$(var.SourceDir)\EdBindings.Model.dll" KeyPath="yes" />
-      </Component>
-      
-      <Component Id="ConfigFiles" Directory="INSTALLFOLDER" Guid="{D4E5F6A7-B8C9-0123-DEF1-234567890123}">
-        <File Id="EdBindings.deps.json" Source="$(var.SourceDir)\EdBindings.deps.json" KeyPath="yes" />
-        <File Id="EdBindings.runtimeconfig.json" Source="$(var.SourceDir)\EdBindings.runtimeconfig.json" />
-        <File Id="ActionMappings.json" Source="$(var.SourceDir)\ActionMappings.json" />
-      </Component>
-      
-      <Component Id="JsonNet" Directory="INSTALLFOLDER" Guid="{E5F6A7B8-C9D0-1234-EF12-345678901234}">
-        <File Id="Newtonsoft.Json.dll" Source="$(var.SourceDir)\Newtonsoft.Json.dll" KeyPath="yes" />
-      </Component>
-      
-      <!-- Device Mappings -->
-      <Component Id="DeviceMappings" Directory="DeviceMappingsFolder" Guid="{F6A7B8C9-D0E1-2345-F123-456789012345}">
-        <File Id="X56.json" Source="$(var.SourceDir)\DeviceMappings\X56.json" KeyPath="yes" />
-      </Component>
+      <ComponentRef Id="MainApplication" />
+      <ComponentRef Id="WpfRuntimeFiles" />
+      <ComponentRef Id="DeviceMappings" />
+      <ComponentRef Id="StartMenuShortcut" />
+      <ComponentRef Id="DesktopShortcut" />
     </Feature>
     
     <!-- Branding -->

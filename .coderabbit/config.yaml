@@ -1,0 +1,170 @@
+# CodeRabbit Projekt-Konfiguration für EdBindings
+# Elite Dangerous Key Binding Viewer
+
+project:
+  name: "EdBindings"
+  type: "wpf-application"
+  framework: "net8.0"
+  language: "csharp"
+  description: "Elite Dangerous Key Binding Configuration Tool"
+
+# Review-Konfiguration
+review:
+  # Automatische Reviews aktivieren
+  enabled: true
+  
+  # Review-Trigger
+  triggers:
+    - pull_request
+    - push_to_main
+    - scheduled
+  
+  # Branch-Konfiguration
+  branches:
+    include: ["main", "develop", "feature/*", "bugfix/*"]
+    exclude: ["temp/*", "experimental/*"]
+  
+  # Dateitypen für Review
+  file_types:
+    include: [".cs", ".csproj", ".sln", ".yml", ".yaml", ".ps1", ".wxs"]
+    exclude: [".Designer.cs", ".g.cs", "AssemblyInfo.cs"]
+
+# AI-Modell Konfiguration
+ai:
+  model: "gpt-4o"
+  temperature: 0.2
+  max_tokens: 4000
+  
+  # Spezielle Prompts für EdBindings
+  custom_prompts:
+    security: |
+      Analysiere den Code auf Sicherheitsprobleme im Kontext einer WPF-Anwendung:
+      - Input Validation für Elite Dangerous Binding Files
+      - File I/O Sicherheit beim Lesen von .binds Dateien
+      - XML Parsing Sicherheit
+      - Potentielle Path Traversal Attacken
+      
+    performance: |
+      Überprüfe Performance-Aspekte für Gaming-Tools:
+      - Effiziente XML Parsing der Elite Dangerous Bindings
+      - Memory Management bei großen Binding-Dateien  
+      - UI Responsiveness für Real-time Updates
+      - Threading für File Monitoring
+      
+    architecture: |
+      Bewerte die Architektur im Kontext des Elite Dangerous Ecosystems:
+      - MVVM Pattern Implementierung
+      - Separation of Concerns zwischen UI und Business Logic
+      - Erweiterbarkeit für neue Elite Dangerous Updates
+      - Plugin-Architektur für Device Mappings
+
+# Projekt-spezifische Regeln
+rules:
+  elite_dangerous:
+    - name: "binding_file_validation"
+      description: "Validiere Elite Dangerous Binding File Struktur"
+      pattern: "*.binds parsing"
+      severity: "high"
+      
+    - name: "device_mapping_consistency" 
+      description: "Prüfe Konsistenz der Device Mappings"
+      pattern: "DeviceMappings/*.json"
+      severity: "medium"
+      
+    - name: "joystick_configuration"
+      description: "Validiere Joystick/HOTAS Konfigurationen"
+      pattern: "SaitekX56*"
+      severity: "medium"
+
+  wpf_specific:
+    - name: "xaml_binding_security"
+      description: "Prüfe XAML Data Binding Sicherheit"
+      pattern: "*.xaml"
+      severity: "high"
+      
+    - name: "ui_threading"
+      description: "Überprüfe UI Thread Compliance"
+      pattern: "Dispatcher.Invoke*"
+      severity: "high"
+
+  installer_security:
+    - name: "msi_permissions"
+      description: "Prüfe MSI Installer Berechtigungen"
+      pattern: "setup/*.wxs"
+      severity: "critical"
+      
+    - name: "wix_security"
+      description: "Validiere WiX Toolset Sicherheitskonfiguration"
+      pattern: "*.wxs"
+      severity: "high"
+
+# Ausschlüsse
+exclusions:
+  # Generierte Dateien
+  generated_files:
+    - "**/*.Designer.cs"
+    - "**/*.g.cs"  
+    - "**/AssemblyInfo.cs"
+    - "obj/**"
+    - "bin/**"
+    
+  # Test-spezifische Ausschlüsse
+  test_files:
+    - "**/*.Test.cs"
+    - "**/*.Tests.cs"
+    - "test/**/*.binds"
+
+# Integration Einstellungen
+integration:
+  github:
+    # PR Integration
+    pr_comments: true
+    pr_summary: true
+    pr_approval: false
+    
+    # Issue Tracking
+    create_issues: false
+    link_issues: true
+    
+    # Status Checks
+    status_checks: true
+    required_status: false
+
+# Metriken und Reporting
+metrics:
+  # Code Quality Metriken
+  track_quality: true
+  complexity_threshold: 15
+  coverage_threshold: 80
+  
+  # Gaming-spezifische Metriken
+  custom_metrics:
+    - name: "binding_coverage"
+      description: "Prozentsatz der unterstützten Elite Dangerous Bindings"
+    - name: "device_support"  
+      description: "Anzahl unterstützter Gaming-Devices"
+    - name: "parsing_performance"
+      description: "Performance des Binding-File Parsings"
+
+# Benachrichtigungen
+notifications:
+  channels:
+    - github_comments
+    - github_reviews
+    
+  conditions:
+    - critical_security_issue
+    - performance_regression
+    - breaking_change
+    
+  template: |
+    🎮 **EdBindings CodeRabbit Review**
+    
+    **Kritische Findings:** {critical_count}
+    **Performance Issues:** {performance_count}  
+    **Code Quality:** {quality_score}/10
+    
+    **Gaming-spezifische Checks:**
+    - Elite Dangerous Kompatibilität ✅
+    - Device Mapping Validierung ✅
+    - Binding File Parsing ✅

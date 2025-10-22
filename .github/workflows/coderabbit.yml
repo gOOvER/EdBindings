@@ -1,0 +1,71 @@
+name: 🤖 CodeRabbit AI Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main, develop]
+  pull_request_review_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  repository-projects: read
+
+jobs:
+  coderabbit:
+    name: 🔍 AI Code Review
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+
+    steps:
+      - name: 🔍 CodeRabbit Review
+        uses: coderabbitai/openai-pr-reviewer@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        with:
+          debug: false
+          review_simple_changes: true
+          review_comment_lgtm: false
+          openai_light_model: gpt-4o-mini
+          openai_heavy_model: gpt-4o
+          openai_timeout_ms: 120000
+          language: de
+          path_filters: |
+            !**/*.min.js
+            !**/*.min.css
+            !**/bin/**
+            !**/obj/**
+            !**/*.Designer.cs
+            !**/AssemblyInfo.cs
+            !**/*.g.cs
+          system_message: |
+            Du bist ein erfahrener .NET/C# Entwickler und Code-Reviewer. 
+            Fokussiere dich auf:
+            - Sicherheitsprobleme in WPF-Anwendungen
+            - Performance-Optimierungen für .NET 8.0
+            - Best Practices für C# und WPF
+            - Potentielle Bugs und Null-Reference-Exceptions
+            - Code-Qualität und Wartbarkeit
+            - MSI Installer Sicherheit
+            - GitHub Actions Workflow Sicherheit
+            
+            Gebe konstruktives Feedback in deutscher Sprache.
+            Erkläre deine Vorschläge und biete Lösungsansätze an.
+          summarize: |
+            Erstelle eine deutsche Zusammenfassung der wichtigsten Findings:
+            - 🔴 Kritische Sicherheitsprobleme
+            - 🟡 Performance-Verbesserungen  
+            - 🔵 Code-Qualität Verbesserungen
+            - ✅ Positive Aspekte des Codes
+            
+            Verwende Emojis und strukturiere die Ausgabe übersichtlich.
+          summarize_release_notes: |
+            Erstelle Release Notes auf Deutsch basierend auf den Änderungen:
+            - Neue Features
+            - Bugfixes  
+            - Performance-Verbesserungen
+            - Breaking Changes
+            - Sicherheitsupdates

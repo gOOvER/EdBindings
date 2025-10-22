@@ -4,7 +4,30 @@ This directory contains GitHub Actions workflows for the EdBindings project.
 
 ## Workflows Overview
 
-### 🔄 CI Workflow (`ci.yml`)
+### 🤖 CodeRabbit AI Review (`coderabbit.yml`)
+**Trigger:** Pull Requests, Review Comments
+- **Purpose:** AI-powered code reviews with gaming focus
+- **Features:**
+  - GPT-4o powered code analysis
+  - Elite Dangerous specific pattern recognition
+  - Gaming hardware (HOTAS/Joystick) validation
+  - WPF gaming performance optimization
+  - German language reviews
+  - Security analysis for gaming tools
+  - MSI installer security validation
+
+### � Pull Request Checks (`pr-check.yml`)
+**Trigger:** Pull Requests to main/develop branches
+- **Purpose:** Comprehensive PR validation pipeline
+- **Features:**
+  - Integrates CodeRabbit AI review as first step
+  - Build validation on Windows runners
+  - Unit test execution
+  - Code formatting validation
+  - Security scanning coordination
+  - Gaming-specific compatibility checks
+
+### �🔄 CI Workflow (`ci.yml`)
 **Trigger:** Push to main/develop branches, Pull Requests to main
 - **Purpose:** Continuous Integration testing
 - **Features:**
@@ -19,47 +42,50 @@ This directory contains GitHub Actions workflows for the EdBindings project.
 - **Purpose:** Create releases with built artifacts
 - **Features:**
   - Builds self-contained executables for Windows x64/x86
+  - Creates MSI installers with WiX Toolset v6
   - Creates ZIP archives for distribution
   - Generates detailed release notes
   - Creates GitHub releases with artifacts
   - Supports both tagged releases and manual triggers
 
-### 📦 Dependency Check (`dependency-check.yml`)
-**Trigger:** Weekly schedule (Mondays) or manual dispatch
-- **Purpose:** Monitor for outdated NuGet packages
+### 📦 Dependency Updates (`dependency-updates.yml`)
+**Trigger:** Weekly schedule or manual dispatch
+- **Purpose:** Automated dependency management
 - **Features:**
-  - Uses dotnet-outdated tool to scan packages
-  - Generates reports on package versions
-  - Helps maintain up-to-date dependencies
-
-### 🔒 Security Scan (`security.yml`)
-**Trigger:** Push/PR to main, weekly schedule (Sundays)
-- **Purpose:** Security vulnerability scanning
-- **Features:**
-  - Scans for vulnerable NuGet packages
-  - Runs CodeQL security analysis
-  - Generates security audit reports
-  - Helps identify potential security issues
+  - Monitors for NuGet package updates
+  - Creates automated PRs for updates
+  - Ensures dependencies stay current and secure
+  - Gaming-library compatibility checking
 
 ## Setup Instructions
 
-### 1. Repository Secrets (Optional)
-Add these secrets in your GitHub repository settings if you want enhanced features:
+### 1. Repository Secrets (Required for CodeRabbit)
+Add these secrets in your GitHub repository settings:
 
+- `OPENAI_API_KEY`: Required for CodeRabbit AI reviews (get from OpenAI)
 - `CODECOV_TOKEN`: For code coverage reporting with Codecov.io (optional but recommended)
 
 ### 2. Branch Protection (Recommended)
 Configure branch protection rules for `main` branch:
 - Require status checks to pass before merging
-- Require CI workflow to pass
+- Require CodeRabbit review to pass
+- Require CI workflow to pass  
 - Require up-to-date branches before merging
 
-### 3. Release Process
+### 3. CodeRabbit Configuration
+CodeRabbit is automatically configured with:
+- Gaming-specific rules for Elite Dangerous integration
+- German language reviews
+- WPF performance optimization checks
+- HOTAS/Gaming hardware validation
+- MSI installer security analysis
+
+### 4. Release Process
 To create a release:
 
 #### Automatic (Recommended):
 1. Create and push a git tag: `git tag v1.0.0 && git push origin v1.0.0`
-2. The release workflow will automatically build and create the release
+2. The release workflow will automatically build MSI and ZIP artifacts
 
 #### Manual:
 1. Go to Actions tab in GitHub
@@ -70,51 +96,63 @@ To create a release:
 
 ## Workflow Status Badges
 
-Add these badges to your main README.md:
+Current badges in main README.md:
 
 ```markdown
 [![CI](https://github.com/gOOvER/EdBindings/actions/workflows/ci.yml/badge.svg)](https://github.com/gOOvER/EdBindings/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/gOOvER/EdBindings/branch/main/graph/badge.svg)](https://codecov.io/gh/gOOvER/EdBindings)
-[![Security Scan](https://github.com/gOOvER/EdBindings/actions/workflows/security.yml/badge.svg)](https://github.com/gOOvER/EdBindings/actions/workflows/security.yml)
+[![CodeRabbit](https://img.shields.io/badge/Code%20Review-AI%20Powered-brightgreen)](https://github.com/gOOvER/EdBindings/actions/workflows/coderabbit.yml)
 [![Release](https://github.com/gOOvER/EdBindings/actions/workflows/release.yml/badge.svg)](https://github.com/gOOvER/EdBindings/actions/workflows/release.yml)
 ```
+
+## 🤖 CodeRabbit Integration Benefits
+
+### Replaced Workflows
+The following workflows were consolidated into CodeRabbit:
+- ❌ `code-quality.yml` → Now handled by CodeRabbit AI
+- ❌ `security-scan.yml` → Security analysis in CodeRabbit
+- ❌ `security.yml` → Integrated into CodeRabbit reviews  
+- ❌ `dependency-check.yml` → Dependency analysis in CodeRabbit
+
+### Enhanced Features with CodeRabbit
+- 🎮 **Gaming-Specific Analysis**: Elite Dangerous integration patterns
+- 🕹️ **Hardware Validation**: HOTAS/Joystick device support checks
+- 🛡️ **Security-First**: Gaming tool security best practices
+- 🇩🇪 **Localized Reviews**: German language feedback
+- ⚡ **Performance Focus**: Gaming UI responsiveness optimization
 
 ## Troubleshooting
 
 ### Common Issues:
 
-1. **MSI Build Fails**: The setup project requires Visual Studio with VDPROJ extension. The workflow creates a note file instead of building the MSI automatically.
+1. **CodeRabbit Reviews Missing**: Ensure `OPENAI_API_KEY` is set in repository secrets
 
-2. **Tests Fail**: Check that all tests pass locally before pushing. The CI workflow treats warnings as errors.
+2. **MSI Build Fails**: WiX Toolset v6 is used - check setup/Build-MSI.ps1 for details
 
-3. **Release Artifacts Missing**: Ensure the project builds successfully and all paths in the workflow are correct.
+3. **Tests Fail**: All tests must pass locally before pushing. CI treats warnings as errors.
 
-4. **Code Formatting Fails**: The CI checks code formatting using `dotnet format --verify-no-changes`. To fix:
-   - Run `.\format-code.ps1` locally to auto-format code
-   - Or run `dotnet format` directly
-   - Commit the formatted changes and push again
+4. **Code Formatting Fails**: Use dotnet format before committing:
+   - Run `dotnet format` to auto-format code
+   - Commit formatted changes and push again
 
 ### Local Testing:
-Before pushing, you can test the build process locally:
+Before pushing, test locally:
 
-```bash
-# Test code formatting (recommended before every commit)
-.\format-code.ps1 -Check
-
-# Auto-format code if needed  
-.\format-code.ps1
-
-# Auto-format and commit in one step (if CI fails due to formatting)
-.\format-and-commit.ps1
-
-# Test CI build
-dotnet restore
+```powershell
+# Test formatting and build
+dotnet format --verify-no-changes
+dotnet restore  
 dotnet build --configuration Release
 dotnet test --configuration Release
 
-# Test release build
-dotnet publish src/EdBindings/EdBindings.csproj --configuration Release --runtime win-x64 --self-contained true
+# Test MSI creation (Windows only)
+.\setup\Build-MSI.ps1 -Version "1.0.0-test" -SourcePath ".\src\EdBindings\bin\Release\net8.0-windows\"
 ```
+
+### CodeRabbit Configuration:
+- Main config: `.coderabbit.yaml`
+- Gaming rules: `.coderabbit/config.yaml`  
+- Custom prompts: `.coderabbit/prompts.md`
+- Feedback template: `.github/ISSUE_TEMPLATE/coderabbit-feedback.md`
 
 ## Customization
 

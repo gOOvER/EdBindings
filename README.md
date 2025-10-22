@@ -5,8 +5,8 @@ A Windows application for Elite Dangerous that reads and displays key binding fi
 [![.NET](https://img.shields.io/badge/.NET-8.0-blue)](https://dotnet.microsoft.com/download/dotnet/8.0)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![CI](https://github.com/gOOvER/EdBindings/actions/workflows/ci.yml/badge.svg)](https://github.com/gOOvER/EdBindings/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/gOOvER/EdBindings/branch/main/graph/badge.svg)](https://codecov.io/gh/gOOvER/EdBindings)
-[![Security Scan](https://github.com/gOOvER/EdBindings/actions/workflows/security.yml/badge.svg)](https://github.com/gOOvER/EdBindings/actions/workflows/security.yml)
+[![CodeRabbit](https://img.shields.io/badge/Code%20Review-AI%20Powered-brightgreen)](https://github.com/gOOvER/EdBindings/actions/workflows/coderabbit.yml)
+[![PR Checks](https://github.com/gOOvER/EdBindings/actions/workflows/pr-check.yml/badge.svg)](https://github.com/gOOvER/EdBindings/actions/workflows/pr-check.yml)
 [![Release](https://github.com/gOOvER/EdBindings/actions/workflows/release.yml/badge.svg)](https://github.com/gOOvER/EdBindings/actions/workflows/release.yml)
 
 <img src="https://raw.githubusercontent.com/ghorsey/EdBindings/main/assets/edbindings.screenshot.gif">
@@ -105,8 +105,19 @@ See [X56.json](https://github.com/gOOvER/EdBindings/blob/main/src/EdBindings/Dev
 
 ## Contributing
 
-Please send a PR with additional Device Mapping Files or improvements!
+Pull Requests sind willkommen! CodeRabbit wird automatisch:
+- 🔍 Code auf Gaming-spezifische Issues prüfen
+- 🛡️ Sicherheitsprobleme identifizieren  
+- ⚡ Performance-Optimierungen vorschlagen
+- 📋 Elite Dangerous Kompatibilität validieren
+
+### Device Mapping Files
+Besonders erwünscht sind:
+- Neue Gaming Device Mappings (HOTAS, Joysticks, etc.)
+- Aktualisierungen für Elite Dangerous Updates
+- Verbesserungen der Hardware-Erkennung
 
 ## Credits
 
 * App Icon made by [Nikita Golubev](https://www.flaticon.com/authors/nikita-golubev) from [www.flaticon.com](https://www.flaticon.com/)
+* Code Reviews powered by [CodeRabbit AI](https://coderabbit.ai/)

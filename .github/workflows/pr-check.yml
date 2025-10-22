@@ -18,6 +18,52 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # AI Code Review with CodeRabbit
+  coderabbit-review:
+    name: 🤖 CodeRabbit AI Review
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      
+    steps:
+      - name: 🤖 CodeRabbit Review
+        uses: coderabbitai/openai-pr-reviewer@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        with:
+          debug: false
+          review_simple_changes: true
+          review_comment_lgtm: false
+          openai_light_model: gpt-4o-mini
+          openai_heavy_model: gpt-4o
+          openai_timeout_ms: 120000
+          language: de
+          path_filters: |
+            !**/*.min.js
+            !**/*.min.css  
+            !**/bin/**
+            !**/obj/**
+            !**/*.Designer.cs
+            !**/AssemblyInfo.cs
+            !**/*.g.cs
+          system_message: |
+            Du bist ein erfahrener .NET/C# Entwickler für das EdBindings Elite Dangerous Tool.
+            Fokussiere dich auf:
+            - 🛡️ Sicherheitsprobleme in WPF-Anwendungen
+            - ⚡ Performance-Optimierungen für .NET 8.0  
+            - 📋 Best Practices für C# und WPF
+            - 🐛 Potentielle Bugs und Null-Reference-Exceptions
+            - 🧹 Code-Qualität und Wartbarkeit
+            - 📦 MSI Installer Sicherheit
+            - 🔧 GitHub Actions Workflow Sicherheit
+            
+            Gebe konstruktives Feedback auf Deutsch mit Code-Beispielen.
+
   # Security and dependency scanning
   security-scan:
     name: 🛡️ Security Scan

@@ -1,0 +1,154 @@
+# CodeRabbit Configuration
+# https://docs.coderabbit.ai/
+
+reviews:
+  # Review settings
+  auto_review: true
+  drafts: false
+  base_branches: ["main", "develop"]
+  
+  # Review scope
+  path_filters:
+    include:
+      - "src/**/*.cs"
+      - "test/**/*.cs" 
+      - "*.csproj"
+      - "*.sln"
+      - ".github/workflows/**/*.yml"
+      - "setup/**/*"
+    exclude:
+      - "bin/**"
+      - "obj/**" 
+      - "*.min.js"
+      - "*.min.css"
+
+  # Review focus areas
+  focus_areas:
+    - security
+    - performance
+    - maintainability
+    - code_quality
+    - best_practices
+    - documentation
+
+  # Language specific settings
+  languages:
+    csharp:
+      enabled: true
+      style_guide: "microsoft"
+      version: "12.0"
+    yaml:
+      enabled: true
+    xml:
+      enabled: true
+    powershell:
+      enabled: true
+
+# AI review configuration  
+ai:
+  # Model settings
+  model: "gpt-4"
+  temperature: 0.1
+  
+  # Review depth
+  review_level: "comprehensive"
+  
+  # Custom prompts
+  prompts:
+    security: "Focus on security vulnerabilities, especially for WPF applications and MSI installers"
+    performance: "Analyze performance implications for .NET 8.0 applications"
+    architecture: "Review architectural decisions for maintainability and scalability"
+
+# Integration settings
+integrations:
+  github:
+    # PR settings
+    pr_title_check: true
+    pr_description_check: true
+    
+    # Comment settings
+    resolve_conversations: true
+    summarize_changes: true
+    
+    # Status checks
+    require_approval: false
+    block_merge_on_issues: false
+
+# Notification settings
+notifications:
+  # When to notify
+  on_new_issues: true
+  on_resolved_issues: true
+  on_review_complete: true
+  
+  # Notification channels
+  channels:
+    - github_comments
+    - github_reviews
+
+# Custom rules
+rules:
+  # C# specific rules
+  csharp:
+    - rule: "check_null_reference"
+      description: "Check for potential null reference exceptions"
+      severity: "high"
+    - rule: "async_await_patterns"
+      description: "Verify proper async/await usage"
+      severity: "medium"
+    - rule: "dispose_patterns"
+      description: "Check IDisposable implementation"
+      severity: "high"
+    - rule: "wpf_best_practices"
+      description: "WPF specific best practices"
+      severity: "medium"
+
+  # Security rules
+  security:
+    - rule: "hardcoded_secrets"
+      description: "Check for hardcoded credentials or secrets"
+      severity: "critical"
+    - rule: "input_validation" 
+      description: "Verify input validation is present"
+      severity: "high"
+    - rule: "file_permissions"
+      description: "Check file access permissions"
+      severity: "medium"
+
+  # Build and deployment rules
+  build:
+    - rule: "msi_security"
+      description: "Review MSI installer security settings"
+      severity: "high"
+    - rule: "github_actions_security"
+      description: "Review GitHub Actions workflow security"
+      severity: "high"
+
+# Exclusions
+exclusions:
+  # Files to exclude from review
+  files:
+    - "**/*.Designer.cs"
+    - "**/AssemblyInfo.cs"
+    - "**/*.g.cs"
+    - "**/bin/**"
+    - "**/obj/**"
+    - "**/*.min.*"
+  
+  # Rules to exclude for specific paths
+  path_rules:
+    "test/**":
+      - "documentation_coverage"
+    "setup/**":
+      - "complexity_analysis"
+
+# Learning and improvement
+learning:
+  # Feedback collection
+  collect_feedback: true
+  
+  # Model improvement
+  improve_suggestions: true
+  
+  # Custom patterns
+  learn_project_patterns: true
