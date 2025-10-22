@@ -355,7 +355,7 @@ jobs:
   # Notify on completion
   notify-completion:
     name: 📢 Notify Completion
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: [check-dependencies, update-dependencies]
     if: always()
     

@@ -20,7 +20,7 @@ permissions:
 jobs:
   code-quality:
     name: 📊 Code Quality Analysis
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     
     steps:
     - name: 📥 Checkout repository
@@ -38,116 +38,125 @@ jobs:
       run: dotnet build --no-restore --configuration Release
 
     - name: 📊 Code Metrics Analysis
+      shell: pwsh
       run: |
-        echo "::group::📊 Code Metrics"
+        Write-Host "::group::📊 Code Metrics"
         
         # Count source files
-        cs_files=$(find src -name "*.cs" -type f 2>/dev/null | wc -l)
+        $cs_files = (Get-ChildItem -Path src -Filter "*.cs" -Recurse -File).Count
         
-        if [ $cs_files -gt 0 ]; then
-          total_lines=$(find src -name "*.cs" -exec wc -l {} + 2>/dev/null | tail -1 | awk '{print $1}')
-          echo "📁 C# Files: $cs_files"
-          echo "📏 Total Lines: $total_lines"
-          echo "✅ Code Metrics: Analysis complete"
-          echo "metrics_status=success" >> $GITHUB_OUTPUT
-        else
-          echo "❌ Code Metrics: No source files found"
-          echo "metrics_status=failure" >> $GITHUB_OUTPUT
-        fi
+        if ($cs_files -gt 0) {
+          $total_lines = (Get-ChildItem -Path src -Filter "*.cs" -Recurse | Get-Content | Measure-Object -Line).Lines
+          Write-Host "📁 C# Files: $cs_files"
+          Write-Host "📏 Total Lines: $total_lines"
+          Write-Host "✅ Code Metrics: Analysis complete"
+          "metrics_status=success" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        } else {
+          Write-Host "❌ Code Metrics: No source files found"
+          "metrics_status=failure" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        }
         
-        echo "::endgroup::"
+        Write-Host "::endgroup::"
       id: metrics
 
     - name: 🔬 Static Analysis  
+      shell: pwsh
       run: |
-        echo "::group::🔬 Static Analysis"
+        Write-Host "::group::🔬 Static Analysis"
         
         # Check if project builds successfully
-        if dotnet build --no-restore --configuration Release --verbosity quiet; then
-          echo "✅ Build: Successful"
-          echo "✅ Static Analysis: No critical issues"
-          echo "analysis_status=success" >> $GITHUB_OUTPUT
-        else
-          echo "❌ Build: Failed with errors"
-          echo "❌ Static Analysis: Critical issues detected"
-          echo "analysis_status=failure" >> $GITHUB_OUTPUT
-        fi
+        $buildResult = dotnet build --no-restore --configuration Release --verbosity quiet
+        if ($LASTEXITCODE -eq 0) {
+          Write-Host "✅ Build: Successful"
+          Write-Host "✅ Static Analysis: No critical issues"
+          "analysis_status=success" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        } else {
+          Write-Host "❌ Build: Failed with errors"
+          Write-Host "❌ Static Analysis: Critical issues detected"
+          "analysis_status=failure" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        }
         
-        echo "::endgroup::"
+        Write-Host "::endgroup::"
       id: analysis
 
     - name: 📚 Documentation Quality
+      shell: pwsh
       run: |
-        echo "::group::📚 Documentation Check"
+        Write-Host "::group::📚 Documentation Check"
         
         # Check README existence and quality
-        if [ -f "README.md" ]; then
-          readme_lines=$(wc -l < README.md)
-          echo "📖 README: Found with $readme_lines lines"
+        if (Test-Path "README.md") {
+          $readme_lines = (Get-Content README.md | Measure-Object -Line).Lines
+          Write-Host "📖 README: Found with $readme_lines lines"
           
-          if [ $readme_lines -gt 10 ]; then
-            echo "✅ Documentation: Good README coverage"
-            echo "docs_status=success" >> $GITHUB_OUTPUT
-          else
-            echo "⚠️ Documentation: README could be more detailed"
-            echo "docs_status=success" >> $GITHUB_OUTPUT  # Don't fail for short README
-          fi
-        else
-          echo "❌ Documentation: No README found"
-          echo "docs_status=failure" >> $GITHUB_OUTPUT
-        fi
+          if ($readme_lines -gt 10) {
+            Write-Host "✅ Documentation: Good README coverage"
+            "docs_status=success" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          } else {
+            Write-Host "⚠️ Documentation: README could be more detailed"
+            "docs_status=success" | Out-File -FilePath $env:GITHUB_OUTPUT -Append  # Don't fail for short README
+          }
+        } else {
+          Write-Host "❌ Documentation: No README found"
+          "docs_status=failure" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        }
         
         # Check for XML documentation
-        xml_docs=$(find src -name "*.cs" -exec grep -l "/// <summary>" {} \; 2>/dev/null | wc -l)
-        if [ $xml_docs -gt 0 ]; then
-          echo "📝 XML Documentation: Found in $xml_docs files"
-        fi
+        $xml_docs = (Get-ChildItem -Path src -Filter "*.cs" -Recurse | Select-String -Pattern "/// <summary>" | Select-Object -Unique Path).Count
+        if ($xml_docs -gt 0) {
+          Write-Host "📝 XML Documentation: Found in $xml_docs files"
+        }
         
-        echo "::endgroup::"
+        Write-Host "::endgroup::"
       id: docs
 
     - name: 📊 Quality Summary Report
       if: always()
+      shell: pwsh
       run: |
-        echo "::group::📊 Code Quality Summary"
+        Write-Host "::group::📊 Code Quality Summary"
         
-        metrics_result="${{ steps.metrics.outputs.metrics_status || 'unknown' }}"
-        analysis_result="${{ steps.analysis.outputs.analysis_status || 'unknown' }}"
-        docs_result="${{ steps.docs.outputs.docs_status || 'unknown' }}"
+        $metrics_result = "${{ steps.metrics.outputs.metrics_status }}"
+        $analysis_result = "${{ steps.analysis.outputs.analysis_status }}"
+        $docs_result = "${{ steps.docs.outputs.docs_status }}"
         
-        echo "| Quality Check | Status | Details |"
-        echo "|---------------|--------|---------|"
-        echo "| Code Metrics | $metrics_result | Lines of code, complexity analysis |"
-        echo "| Static Analysis | $analysis_result | Code style, potential issues |"
-        echo "| Documentation | $docs_result | README, XML docs, spell check |"
-        echo ""
+        if ([string]::IsNullOrEmpty($metrics_result)) { $metrics_result = "unknown" }
+        if ([string]::IsNullOrEmpty($analysis_result)) { $analysis_result = "unknown" }
+        if ([string]::IsNullOrEmpty($docs_result)) { $docs_result = "unknown" }
+        
+        Write-Host "| Quality Check | Status | Details |"
+        Write-Host "|---------------|--------|---------|"
+        Write-Host "| Code Metrics | $metrics_result | Lines of code, complexity analysis |"
+        Write-Host "| Static Analysis | $analysis_result | Code style, potential issues |"
+        Write-Host "| Documentation | $docs_result | README, XML docs, spell check |"
+        Write-Host ""
         
         # Calculate overall score
-        score=0
-        total=3
+        $score = 0
+        $total = 3
         
-        [ "$metrics_result" = "success" ] && score=$((score + 1))
-        [ "$analysis_result" = "success" ] && score=$((score + 1))
-        [ "$docs_result" = "success" ] && score=$((score + 1))
+        if ($metrics_result -eq "success") { $score++ }
+        if ($analysis_result -eq "success") { $score++ }
+        if ($docs_result -eq "success") { $score++ }
         
-        percentage=$((score * 100 / total))
+        $percentage = [math]::Round(($score * 100 / $total), 0)
         
-        echo "## 🎯 Overall Quality Score: $percentage%"
-        echo ""
+        Write-Host "## 🎯 Overall Quality Score: $percentage%"
+        Write-Host ""
         
-        if [ $percentage -ge 90 ]; then
-          echo "🏆 **Excellent!** Your code meets high quality standards."
-        elif [ $percentage -ge 70 ]; then
-          echo "✅ **Good!** Code quality is acceptable with minor improvements possible."
-        elif [ $percentage -ge 50 ]; then
-          echo "⚠️ **Needs Improvement** Several quality issues need attention."
-        else
-          echo "❌ **Poor Quality** Significant improvements required."
-        fi
+        if ($percentage -ge 90) {
+          Write-Host "🏆 **Excellent!** Your code meets high quality standards."
+        } elseif ($percentage -ge 70) {
+          Write-Host "✅ **Good!** Code quality is acceptable with minor improvements possible."
+        } elseif ($percentage -ge 50) {
+          Write-Host "⚠️ **Needs Improvement** Several quality issues need attention."
+        } else {
+          Write-Host "❌ **Poor Quality** Significant improvements required."
+        }
         
-        echo "::endgroup::"
+        Write-Host "::endgroup::"
         
         # Exit with error if quality is too low (optional - can be disabled)
-        # if [ $percentage -lt 50 ]; then
+        # if ($percentage -lt 50) {
         #   exit 1
-        # fi
+        # }
