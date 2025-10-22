@@ -8,25 +8,25 @@ using System.Xml.Linq;
 
 namespace EdBindings.Model.BindingsRaw.Bindings;
 
+/// <summary>
+/// Record BindingGroup.
+/// </summary>
+public record BindingGroup(string Name, List<Binding> Bindings) : Binding(Name)
+{
     /// <summary>
-    /// Record BindingGroup.
+    /// Makes the binding group.
     /// </summary>
-    public record BindingGroup(string Name, List<Binding> Bindings) : Binding(Name)
+    /// <param name="element">The element.</param>
+    /// <returns>EdBindings.Model.BindingsRaw.Bindings.Binding.</returns>
+    public static Binding? MakeBindingGroup(XElement element)
     {
-        /// <summary>
-        /// Makes the binding group.
-        /// </summary>
-        /// <param name="element">The element.</param>
-        /// <returns>EdBindings.Model.BindingsRaw.Bindings.Binding.</returns>
-        public static Binding? MakeBindingGroup(XElement element)
+        if (!element.HasElements)
         {
-            if (!element.HasElements)
-            {
-                return null;
-            }
-
-            return new BindingGroup(
-                Name: element.Name.LocalName,
-                Bindings: element.Descendants().Select(element => MakeBinding(element)).Where(b => b != null).ToList()!);
+            return null;
         }
+
+        return new BindingGroup(
+            Name: element.Name.LocalName,
+            Bindings: element.Descendants().Select(element => MakeBinding(element)).Where(b => b != null).ToList()!);
     }
+}

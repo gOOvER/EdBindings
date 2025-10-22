@@ -64,7 +64,20 @@ jobs:
       run: |
         Write-Host "::group::🔬 Static Analysis"
         
+        # Check code formatting first
+        Write-Host "🎨 Checking code formatting..."
+        dotnet format --verify-no-changes --verbosity quiet
+        if ($LASTEXITCODE -ne 0) {
+          Write-Host "❌ Code Formatting: Issues found"
+          Write-Host "💡 Run 'dotnet format' locally to fix formatting"
+          "analysis_status=failure" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "::endgroup::"
+          return
+        }
+        Write-Host "✅ Code Formatting: Correct"
+        
         # Check if project builds successfully
+        Write-Host "🏗️ Building project..."
         $buildResult = dotnet build --no-restore --configuration Release --verbosity quiet
         if ($LASTEXITCODE -eq 0) {
           Write-Host "✅ Build: Successful"
