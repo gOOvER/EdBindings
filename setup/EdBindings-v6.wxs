@@ -9,9 +9,44 @@
            Compressed="yes">
 
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
-    
-    <!-- Simple file inclusion with modern WiX v6 syntax -->
-    <Files Include="$(var.SourceDir)\*" />
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Installation directory -->
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="EdBindings">
+        <Directory Id="DeviceMappingsFolder" Name="DeviceMappings" />
+      </Directory>
+    </StandardDirectory>
+
+    <!-- Feature with explicit file components -->
+    <Feature Id="Complete" Title="EdBindings" Level="1">
+      <Component Id="MainExe" Directory="INSTALLFOLDER" Guid="{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}">
+        <File Id="EdBindings.exe" Source="$(var.SourceDir)\EdBindings.exe" KeyPath="yes" />
+      </Component>
+      
+      <Component Id="MainDll" Directory="INSTALLFOLDER" Guid="{B2C3D4E5-F6A7-8901-BCDE-F12345678901}">
+        <File Id="EdBindings.dll" Source="$(var.SourceDir)\EdBindings.dll" KeyPath="yes" />
+      </Component>
+      
+      <Component Id="ModelDll" Directory="INSTALLFOLDER" Guid="{C3D4E5F6-A7B8-9012-CDEF-123456789012}">
+        <File Id="EdBindings.Model.dll" Source="$(var.SourceDir)\EdBindings.Model.dll" KeyPath="yes" />
+      </Component>
+      
+      <Component Id="ConfigFiles" Directory="INSTALLFOLDER" Guid="{D4E5F6A7-B8C9-0123-DEF1-234567890123}">
+        <File Id="EdBindings.deps.json" Source="$(var.SourceDir)\EdBindings.deps.json" KeyPath="yes" />
+        <File Id="EdBindings.runtimeconfig.json" Source="$(var.SourceDir)\EdBindings.runtimeconfig.json" />
+        <File Id="ActionMappings.json" Source="$(var.SourceDir)\ActionMappings.json" />
+      </Component>
+      
+      <Component Id="JsonNet" Directory="INSTALLFOLDER" Guid="{E5F6A7B8-C9D0-1234-EF12-345678901234}">
+        <File Id="Newtonsoft.Json.dll" Source="$(var.SourceDir)\Newtonsoft.Json.dll" KeyPath="yes" />
+      </Component>
+      
+      <!-- Device Mappings -->
+      <Component Id="DeviceMappings" Directory="DeviceMappingsFolder" Guid="{F6A7B8C9-D0E1-2345-F123-456789012345}">
+        <File Id="X56.json" Source="$(var.SourceDir)\DeviceMappings\X56.json" KeyPath="yes" />
+      </Component>
+    </Feature>
     
     <!-- Branding -->
     <Property Id="ARPHELPLINK" Value="https://github.com/gOOvER/EdBindings" />
