@@ -61,6 +61,18 @@ jobs:
     - name: Publish Windows x86
       run: dotnet publish src/EdBindings/EdBindings.csproj --configuration Release --runtime win-x86 --self-contained true --output ./publish/win-x86
 
+    - name: Get Version
+      id: version
+      run: |
+        if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+          $version = "${{ github.event.inputs.version }}"
+        } else {
+          $version = $env:GITHUB_REF -replace 'refs/tags/', ''
+        }
+        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        echo "Version: $version"
+        Write-Host "📋 Using version: $version" -ForegroundColor Green
+
     - name: 🔨 Build MSI Installer (Automated)
       run: |
         # Install WiX Toolset v3.14 (latest stable)
@@ -111,7 +123,9 @@ jobs:
         
         # Create MSI using PowerShell script  
         Write-Host "🏗️ Building MSI installer..." -ForegroundColor Green
-        $buildSuccess = & .\setup\Build-MSI.ps1 -SourcePath "./publish/win-x64" -OutputPath "./publish" -Version $env:VERSION
+        $version = "${{ steps.version.outputs.VERSION }}"
+        Write-Host "Building MSI for version: $version" -ForegroundColor Cyan
+        $buildSuccess = & .\setup\Build-MSI.ps1 -SourcePath "./publish/win-x64" -OutputPath "./publish" -Version $version
         
         if (-not $buildSuccess) {
           Write-Host "ℹ️ MSI build requires manual steps - check BUILD_INSTRUCTIONS.txt in release" -ForegroundColor Yellow
@@ -166,19 +180,9 @@ jobs:
 
     - name: Create ZIP archives
       run: |
-        Compress-Archive -Path "./publish/win-x64/*" -DestinationPath "./EdBindings-win-x64.zip"
-        Compress-Archive -Path "./publish/win-x86/*" -DestinationPath "./EdBindings-win-x86.zip"
-
-    - name: Get version
-      id: version
-      run: |
-        if ("${{ github.event_name }}" -eq "workflow_dispatch") {
-          $version = "${{ github.event.inputs.version }}"
-        } else {
-          $version = $env:GITHUB_REF -replace 'refs/tags/', ''
-        }
-        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
-        echo "Version: $version"
+        $version = "${{ steps.version.outputs.VERSION }}"
+        Compress-Archive -Path "./publish/win-x64/*" -DestinationPath "./EdBindings-$version-win-x64.zip"
+        Compress-Archive -Path "./publish/win-x86/*" -DestinationPath "./EdBindings-$version-win-x86.zip"
 
     - name: Create Release Notes
       id: release_notes
@@ -227,8 +231,8 @@ jobs:
         draft: false
         prerelease: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.prerelease == 'true' || contains(steps.version.outputs.VERSION, '-') }}
         files: |
-          ./EdBindings-win-x64.zip
-          ./EdBindings-win-x86.zip
+          ./EdBindings-${{ steps.version.outputs.VERSION }}-win-x64.zip
+          ./EdBindings-${{ steps.version.outputs.VERSION }}-win-x86.zip
           ./publish/EdBindings-*.msi
           ./publish/MSI_BUILD_GUIDE.md
       env:
