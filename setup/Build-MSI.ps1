@@ -83,8 +83,18 @@ Alternative: Use Visual Studio with Installer Projects extension
 }
 
 try {
-    # Use appropriate .wxs file based on WiX version or user preference
-    $wxsFile = Join-Path $PSScriptRoot "EdBindings.wxs"
+    # Generate complete WiX file for self-contained deployment
+    Write-Host "🔍 Generating complete WiX configuration..." -ForegroundColor Cyan
+    $generateScript = Join-Path $PSScriptRoot "Generate-WiXFile.ps1"
+    $generatedWxs = Join-Path $PSScriptRoot "EdBindings-Generated.wxs"
+    
+    & $generateScript -SourceDir $SourcePath -OutputFile $generatedWxs
+    
+    if (-not (Test-Path $generatedWxs)) {
+        throw "Failed to generate WiX file"
+    }
+    
+    $wxsFile = $generatedWxs
     $objFile = Join-Path $OutputPath "EdBindings.wixobj"
     $msiFile = Join-Path $OutputPath "$ProductName-$Version.msi"
     

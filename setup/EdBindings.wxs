@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  
-  <Package Name="EdBindings" 
-           Language="1033" 
-           Version="$(var.Version)" 
-           Manufacturer="Elite Dangerous Community" 
+
+  <Package Name="EdBindings"
+           Language="1033"
+           Version="$(var.Version)"
+           Manufacturer="Elite Dangerous Community"
            UpgradeCode="12345678-1234-1234-1234-123456789012"
-           InstallerVersion="500" 
-           Compressed="yes" 
+           InstallerVersion="500"
+           Compressed="yes"
            Scope="perMachine">
-    
+
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
-    
+
     <MediaTemplate EmbedCab="yes" />
 
     <!-- Directory Structure -->
@@ -24,46 +24,51 @@
     <!-- Main Application Component -->
     <DirectoryRef Id="INSTALLFOLDER">
       <Component Id="MainFiles" Guid="87654321-4321-4321-4321-210987654321">
-        <!-- Main executable -->
-        <File Id="EdBindingsExe" 
-              Source="$(var.SourceDir)\EdBindings.exe" 
+        <!-- Main executable with shortcuts -->
+        <File Id="EdBindingsExe"
+              Source="$(var.SourceDir)\EdBindings.exe"
               KeyPath="yes">
-          <Shortcut Id="StartMenuShortcut" 
-                    Directory="ProgramMenuFolder" 
+          <Shortcut Id="StartMenuShortcut"
+                    Directory="ProgramMenuFolder"
+                    Name="EdBindings"
+                    Description="Elite Dangerous Key Binding Viewer"
+                    WorkingDirectory="INSTALLFOLDER" />
+          <Shortcut Id="DesktopShortcut"
+                    Directory="DesktopFolder"
                     Name="EdBindings"
                     Description="Elite Dangerous Key Binding Viewer"
                     WorkingDirectory="INSTALLFOLDER" />
         </File>
-        
-        <!-- Application DLLs -->
+      </Component>
+
+      <!-- Application Files Component -->
+      <Component Id="ApplicationFiles" Guid="11111111-2222-3333-4444-555555555555">
+        <File Id="EdBindingsDll" Source="$(var.SourceDir)\EdBindings.dll" />
         <File Id="EdBindingsModelDll" Source="$(var.SourceDir)\EdBindings.Model.dll" />
         <File Id="NewtonsoftJsonDll" Source="$(var.SourceDir)\Newtonsoft.Json.dll" />
-        
-        <!-- Runtime configuration -->
         <File Id="EdBindingsRuntimeConfig" Source="$(var.SourceDir)\EdBindings.runtimeconfig.json" />
         <File Id="EdBindingsDeps" Source="$(var.SourceDir)\EdBindings.deps.json" />
-        
-        <!-- Application data -->
-        <File Id="ActionMappingsJson" Source="$(var.SourceDir)\ActionMappings.json" />
+        <File Id="ActionMappingsJson" Source="$(var.SourceDir)\ActionMappings.json" KeyPath="yes" />
       </Component>
     </DirectoryRef>
 
     <!-- Device Mappings Component -->
     <DirectoryRef Id="DeviceMappingsFolder">
       <Component Id="DeviceMappingsFiles" Guid="22222222-3333-4444-5555-666666666666">
-        <File Id="X56JsonFile" 
-              Source="$(var.SourceDir)\DeviceMappings\X56.json" 
+        <File Id="X56JsonFile"
+              Source="$(var.SourceDir)\DeviceMappings\X56.json"
               KeyPath="yes" />
       </Component>
     </DirectoryRef>
 
     <!-- Features -->
-    <Feature Id="ProductFeature" 
-             Title="EdBindings Application" 
+    <Feature Id="ProductFeature"
+             Title="EdBindings Application"
              Level="1">
       <ComponentRef Id="MainFiles" />
+      <ComponentRef Id="ApplicationFiles" />
       <ComponentRef Id="DeviceMappingsFiles" />
     </Feature>
-    
+
   </Package>
 </Wix>
