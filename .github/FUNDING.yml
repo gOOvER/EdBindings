@@ -1,15 +1,27 @@
-# These are supported funding model platforms
+# 💝 Support EdBindings Development
+# Your support helps maintain and improve this Elite Dangerous key binding tool
 
+# 🌟 GitHub Sponsors
 github: goover
+
+# 🎨 Creative Platform Support
 patreon: oldnoob
-open_collective: # Replace with a single Open Collective username
+
+# ☕ Coffee & Quick Support
 ko_fi: oldnoob
-tidelift: # Replace with a single Tidelift platform-name/package-name e.g., npm/babel
-community_bridge: # Replace with a single Community Bridge project-name e.g., cloud-foundry
-liberapay: # Replace with a single Liberapay username
-issuehunt: # Replace with a single IssueHunt username
-lfx_crowdfunding: # Replace with a single LFX Crowdfunding project-name e.g., cloud-foundry
-polar: # Replace with a single Polar username
 buy_me_a_coffee: goover
-thanks_dev: #gh/goover
+
+# 🎯 Developer Appreciation
+thanks_dev: "u/gh/goover"
+
+# 🔗 Primary Donation Platform
 custom: https://donate.goover.dev
+
+# 📝 Additional platforms (not currently used)
+# open_collective: # Replace with Open Collective username
+# tidelift: # Replace with Tidelift platform-name/package-name
+# community_bridge: # Replace with Community Bridge project-name
+# liberapay: # Replace with Liberapay username
+# issuehunt: # Replace with IssueHunt username
+# lfx_crowdfunding: # Replace with LFX Crowdfunding project-name
+# polar: # Replace with Polar username
