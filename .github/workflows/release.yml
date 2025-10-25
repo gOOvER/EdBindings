@@ -78,19 +78,24 @@ jobs:
         # Install WiX v6.0.2 via .NET Tool (latest version, free for MIT projects)
         Write-Host "🔽 Installing WiX Toolset v6.0.2..." -ForegroundColor Cyan
         dotnet tool install --global wix --version 6.0.2
-        
+
         # Verify WiX installation
         Write-Host "✅ WiX v6 installed successfully" -ForegroundColor Green
         wix --version
-        
+
         # Create MSI using PowerShell script
         Write-Host "🏗️ Building MSI installer..." -ForegroundColor Green
         $version = "${{ steps.version.outputs.VERSION }}"
         Write-Host "Building MSI for version: $version" -ForegroundColor Cyan
+
+        # Run the corrected Build-MSI script
         $buildSuccess = & .\setup\Build-MSI.ps1 -SourcePath "./publish/win-x64" -OutputPath "./publish" -Version $version
 
-        if (-not $buildSuccess) {
-          Write-Host "ℹ️ MSI build requires manual steps - check BUILD_INSTRUCTIONS.txt in release" -ForegroundColor Yellow
+        if ($buildSuccess) {
+          Write-Host "✅ MSI created successfully" -ForegroundColor Green
+        } else {
+          Write-Host "❌ MSI build failed" -ForegroundColor Red
+          exit 1
         }
 
         # Fallback: Create detailed build guide if MSI build fails

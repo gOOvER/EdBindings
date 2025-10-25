@@ -1,10 +1,10 @@
 param(
     [Parameter(Mandatory=$true)]
     [string]$SourcePath,
-    
+
     [Parameter(Mandatory=$true)]
     [string]$OutputPath,
-    
+
     [string]$Version = "1.0.0",
     [string]$ProductName = "EdBindings"
 )
@@ -12,24 +12,24 @@ param(
 # Normalize version for MSI compatibility (WiX requires x.y.z.w format)
 function Normalize-Version {
     param([string]$InputVersion)
-    
+
     # Remove any leading dots or dashes
     $cleanVersion = $InputVersion -replace '^[\.\-]+', ''
-    
+
     # Handle pre-release versions (remove -beta, -alpha, etc.)
     $cleanVersion = $cleanVersion -replace '\-.*$', ''
-    
+
     # Ensure we have at least 3 parts (x.y.z)
     $parts = $cleanVersion.Split('.')
     while ($parts.Length -lt 3) {
         $parts += "0"
     }
-    
+
     # WiX allows max 4 parts, truncate if more
     if ($parts.Length -gt 4) {
         $parts = $parts[0..3]
     }
-    
+
     # Join and validate each part is numeric
     $normalizedParts = @()
     foreach ($part in $parts) {
@@ -39,7 +39,7 @@ function Normalize-Version {
         }
         $normalizedParts += $numericPart
     }
-    
+
     return $normalizedParts -join '.'
 }
 
@@ -87,33 +87,33 @@ try {
     Write-Host "🔍 Generating complete WiX configuration..." -ForegroundColor Cyan
     $generateScript = Join-Path $PSScriptRoot "Generate-WiXFile.ps1"
     $generatedWxs = Join-Path $PSScriptRoot "EdBindings-Generated.wxs"
-    
-    & $generateScript -SourceDir $SourcePath -OutputFile $generatedWxs
-    
-    if (-not (Test-Path $generatedWxs)) {
+
+    $wxsOutputPath = & $generateScript -SourceDir $SourcePath
+
+    if (-not (Test-Path $wxsOutputPath)) {
         throw "Failed to generate WiX file"
     }
-    
-    $wxsFile = $generatedWxs
+
+    $wxsFile = $wxsOutputPath
     $objFile = Join-Path $OutputPath "EdBindings.wixobj"
     $msiFile = Join-Path $OutputPath "$ProductName-$Version.msi"
-    
+
     # Validate inputs
     Write-Host "🔍 Validating build environment..." -ForegroundColor Cyan
     Write-Host "WXS File: $wxsFile" -ForegroundColor Gray
     Write-Host "Source Path: $SourcePath" -ForegroundColor Gray
     Write-Host "Output Path: $OutputPath" -ForegroundColor Gray
-    
+
     if (-not (Test-Path $wxsFile)) {
         Write-Host "❌ WiX source file not found: $wxsFile" -ForegroundColor Red
         return $false
     }
-    
+
     if (-not (Test-Path $SourcePath)) {
         Write-Host "❌ Source directory not found: $SourcePath" -ForegroundColor Red
         return $false
     }
-    
+
     # Check for main executable
     $mainExe = Join-Path $SourcePath "EdBindings.exe"
     if (-not (Test-Path $mainExe)) {
@@ -122,16 +122,16 @@ try {
         Get-ChildItem $SourcePath -File | ForEach-Object { Write-Host "   $($_.Name)" -ForegroundColor Gray }
         return $false
     }
-    
+
     Write-Host "✅ All required files found" -ForegroundColor Green
-    
+
     Write-Host "Building MSI with WiX..." -ForegroundColor Cyan
     Write-Host "Using normalized version: $NormalizedVersion" -ForegroundColor Yellow
     Write-Host "Command: wix build `"$wxsFile`" -d SourceDir=`"$SourcePath`" -d Version=`"$NormalizedVersion`" -o `"$msiFile`"" -ForegroundColor Gray
-    
+
     $wixResult = & wix build $wxsFile -d "SourceDir=$SourcePath" -d "Version=$NormalizedVersion" -o $msiFile 2>&1
     Write-Host "WiX build output: $wixResult" -ForegroundColor Gray
-    
+
     if ($LASTEXITCODE -eq 0) {
         Write-Host "✅ MSI created successfully: $msiFile" -ForegroundColor Green
         return $true

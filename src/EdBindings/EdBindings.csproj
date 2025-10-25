@@ -4,12 +4,24 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
-    <MinVerTagPrefix>v</MinVerTagPrefix>
     <ApplicationIcon>joystick.ico</ApplicationIcon>
     <StartupObject />
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsNotAsErrors>CS8600;CS8601;CS8602;CS8603;CS8604;CS0618</WarningsNotAsErrors>
+
+    <!-- Version Information -->
+    <AssemblyVersion>1.0.0-beta1</AssemblyVersion>
+    <FileVersion>1.0.0-beta1</FileVersion>
+    <Version>1.0.0-beta1</Version>
+    <AssemblyTitle>ED:Bindings - Elite Dangerous Key Binding Viewer</AssemblyTitle>
+    <AssemblyDescription>A WPF application for viewing and managing Elite Dangerous key bindings with modern UI and alternating row colors.</AssemblyDescription>
+    <AssemblyCopyright>Copyright © 2025 gOOvER</AssemblyCopyright>
+    <AssemblyCompany>gOOvER</AssemblyCompany>
+    <AssemblyProduct>EdBindings</AssemblyProduct>
+
+    <!-- Disable MinVer for explicit version control -->
+    <MinVerSkip>true</MinVerSkip>
   </PropertyGroup>
 
   <ItemGroup>
