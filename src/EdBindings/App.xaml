@@ -16,6 +16,12 @@
                     <SolidColorBrush x:Key="BorderBrush" Color="#E1DFDD"/>
                     <SolidColorBrush x:Key="TextBrush" Color="#323130"/>
                     <SolidColorBrush x:Key="DisabledBrush" Color="#A19F9D"/>
+                    
+                    <!-- Elite Dangerous inspired alternating row colors -->
+                    <SolidColorBrush x:Key="RowBackgroundBrush" Color="#FFFFFF"/>
+                    <SolidColorBrush x:Key="AlternatingRowBackgroundBrush" Color="#F5F7FA"/>
+                    <SolidColorBrush x:Key="SelectedRowBrush" Color="#E3F2FD"/>
+                    <SolidColorBrush x:Key="HoverRowBrush" Color="#ECEFF1"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
 
@@ -84,12 +90,121 @@
                 <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="GridLinesVisibility" Value="Horizontal"/>
                 <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource BorderBrush}"/>
-                <Setter Property="AlternatingRowBackground" Value="#F9F9F9"/>
-                <Setter Property="RowBackground" Value="{StaticResource SurfaceBrush}"/>
+                <Setter Property="AlternatingRowBackground" Value="{StaticResource AlternatingRowBackgroundBrush}"/>
+                <Setter Property="RowBackground" Value="{StaticResource RowBackgroundBrush}"/>
                 <Setter Property="HeadersVisibility" Value="Column"/>
                 <Setter Property="CanUserResizeRows" Value="False"/>
                 <Setter Property="SelectionMode" Value="Single"/>
                 <Setter Property="SelectionUnit" Value="FullRow"/>
+                <Setter Property="RowHeight" Value="32"/>
+                
+                <!-- Enhanced Row Styling -->
+                <Setter Property="RowStyle">
+                    <Setter.Value>
+                        <Style TargetType="DataGridRow">
+                            <Setter Property="Background" Value="{StaticResource RowBackgroundBrush}"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="Margin" Value="0"/>
+                            <Setter Property="Padding" Value="0"/>
+                            <Style.Triggers>
+                                <!-- Mouse Over Effect -->
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource HoverRowBrush}"/>
+                                </Trigger>
+                                <!-- Selection Effect -->
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource SelectedRowBrush}"/>
+                                    <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                                </Trigger>
+                                <!-- Combine hover and selection -->
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsSelected" Value="True"/>
+                                        <Condition Property="IsMouseOver" Value="True"/>
+                                    </MultiTrigger.Conditions>
+                                    <Setter Property="Background" Value="{StaticResource SelectedRowBrush}"/>
+                                </MultiTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+                
+                <!-- Enhanced Cell Styling -->
+                <Setter Property="CellStyle">
+                    <Setter.Value>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="Padding" Value="8,6"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="DataGridCell">
+                                        <Border Background="{TemplateBinding Background}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+                
+                <!-- Enhanced Header Styling -->
+                <Setter Property="ColumnHeaderStyle">
+                    <Setter.Value>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
+                            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+                            <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                            <Setter Property="Padding" Value="8,10"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="FontSize" Value="14"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="DataGridColumnHeader">
+                                        <Border Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                Padding="{TemplateBinding Padding}">
+                                            <Grid>
+                                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                                <!-- Sort indicator -->
+                                                <Path x:Name="SortArrow" Visibility="Collapsed" 
+                                                      Data="M0,0 L5,5 L10,0 Z" Fill="{StaticResource TextBrush}"
+                                                      HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                      Margin="0,0,8,0"/>
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="SortDirection" Value="Ascending">
+                                                <Setter TargetName="SortArrow" Property="Visibility" Value="Visible"/>
+                                                <Setter TargetName="SortArrow" Property="Data" Value="M0,5 L5,0 L10,5 Z"/>
+                                            </Trigger>
+                                            <Trigger Property="SortDirection" Value="Descending">
+                                                <Setter TargetName="SortArrow" Property="Visibility" Value="Visible"/>
+                                                <Setter TargetName="SortArrow" Property="Data" Value="M0,0 L5,5 L10,0 Z"/>
+                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Setter.Value>
+                </Setter>
             </Style>
         </ResourceDictionary>
     </Application.Resources>

@@ -5,7 +5,7 @@
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <MinVerTagPrefix>v</MinVerTagPrefix>
-    <ApplicationIcon />
+    <ApplicationIcon>joystick.ico</ApplicationIcon>
     <StartupObject />
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
