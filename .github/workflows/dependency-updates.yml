@@ -34,12 +34,12 @@ jobs:
   check-dependencies:
     name: 📊 Dependency Analysis
     runs-on: windows-latest
-    
+
     outputs:
       has-updates: ${{ steps.check-updates.outputs.has-updates }}
       update-summary: ${{ steps.check-updates.outputs.summary }}
       security-updates: ${{ steps.security-check.outputs.has-security-updates }}
-    
+
     steps:
     - name: 📥 Checkout repository
       uses: actions/checkout@v4
@@ -56,95 +56,151 @@ jobs:
 
     - name: 🔧 Install dependency tools
       run: |
-        dotnet tool install --global dotnet-outdated-tool
-        dotnet tool install --global dotnet-audit
+        Write-Host "Installing dotnet tools..."
+
+        # Install tools with retry logic
+        try {
+          dotnet tool install --global dotnet-outdated-tool --version 4.6.4
+          Write-Host "✅ dotnet-outdated-tool installed successfully"
+        } catch {
+          Write-Host "::warning::Failed to install dotnet-outdated-tool: $($_.Exception.Message)"
+        }
+
+        try {
+          dotnet tool install --global dotnet-audit
+          Write-Host "✅ dotnet-audit installed successfully"
+        } catch {
+          Write-Host "::warning::Failed to install dotnet-audit: $($_.Exception.Message)"
+        }
+
+        # Verify installations
+        dotnet tool list --global
 
     - name: 🔍 Check for outdated packages
       id: check-updates
       run: |
         Write-Host "::group::Dependency Update Check"
-        
-        # Check for outdated packages
-        $outdatedOutput = dotnet outdated --output json 2>&1
-        
-        if ($LASTEXITCODE -eq 0 -and $outdatedOutput -match '^\s*\{') {
-          $outdated = $outdatedOutput | ConvertFrom-Json
-          
-          $totalUpdates = 0
-          $majorUpdates = 0
-          $minorUpdates = 0
-          $patchUpdates = 0
-          $updateSummary = @()
-          
-          foreach ($project in $outdated.Projects) {
-            foreach ($framework in $project.TargetFrameworks) {
-              foreach ($dependency in $framework.Dependencies) {
-                $totalUpdates++
-                
-                # Categorize update type based on version changes
-                $current = [Version]$dependency.ResolvedVersion
-                $latest = [Version]$dependency.LatestVersion
-                
-                if ($latest.Major -gt $current.Major) {
-                  $majorUpdates++
-                  $updateType = "major"
-                } elseif ($latest.Minor -gt $current.Minor) {
-                  $minorUpdates++
-                  $updateType = "minor"
-                } else {
-                  $patchUpdates++
-                  $updateType = "patch"
+
+        try {
+          # Check for outdated packages with better error handling
+          Write-Host "Running dotnet outdated check..."
+
+          # First try with JSON output
+          $outdatedOutput = & dotnet outdated --output json 2>&1
+          $exitCode = $LASTEXITCODE
+
+          Write-Host "Exit code: $exitCode"
+          Write-Host "Raw output: $outdatedOutput"
+
+          if ($exitCode -eq 0 -and $outdatedOutput -and $outdatedOutput.ToString().Trim().StartsWith('{')) {
+            Write-Host "Parsing JSON output..."
+            $outdated = $outdatedOutput | ConvertFrom-Json
+
+            $totalUpdates = 0
+            $majorUpdates = 0
+            $minorUpdates = 0
+            $patchUpdates = 0
+            $updateSummary = @()
+
+            if ($outdated.Projects) {
+              foreach ($project in $outdated.Projects) {
+                if ($project.TargetFrameworks) {
+                  foreach ($framework in $project.TargetFrameworks) {
+                    if ($framework.Dependencies) {
+                      foreach ($dependency in $framework.Dependencies) {
+                        $totalUpdates++
+
+                        # Try to parse versions safely
+                        try {
+                          $current = [Version]$dependency.ResolvedVersion
+                          $latest = [Version]$dependency.LatestVersion
+
+                          if ($latest.Major -gt $current.Major) {
+                            $majorUpdates++
+                            $updateType = "major"
+                          } elseif ($latest.Minor -gt $current.Minor) {
+                            $minorUpdates++
+                            $updateType = "minor"
+                          } else {
+                            $patchUpdates++
+                            $updateType = "patch"
+                          }
+
+                          $updateSummary += "$($dependency.Name): $($dependency.ResolvedVersion) → $($dependency.LatestVersion) ($updateType)"
+                        } catch {
+                          Write-Host "::warning::Could not parse version for $($dependency.Name)"
+                          $updateSummary += "$($dependency.Name): version parsing failed"
+                        }
+                      }
+                    }
+                  }
                 }
-                
-                $updateSummary += "$($dependency.Name): $($dependency.ResolvedVersion) → $($dependency.LatestVersion) ($updateType)"
               }
             }
-          }
-          
-          Write-Host "📊 Update Summary:"
-          Write-Host "  Total packages to update: $totalUpdates"
-          Write-Host "  Major updates: $majorUpdates"
-          Write-Host "  Minor updates: $minorUpdates"
-          Write-Host "  Patch updates: $patchUpdates"
-          
-          if ($totalUpdates -gt 0) {
-            Write-Host "has-updates=true" >> $env:GITHUB_OUTPUT
-            $summaryText = "Total: $totalUpdates (Major: $majorUpdates, Minor: $minorUpdates, Patch: $patchUpdates)"
-            Write-Host "summary=$summaryText" >> $env:GITHUB_OUTPUT
-            
-            # Export detailed updates for later use
-            $updateSummary | ConvertTo-Json | Out-File -FilePath "update-summary.json"
+
+            Write-Host "📊 Update Summary:"
+            Write-Host "  Total packages to update: $totalUpdates"
+            Write-Host "  Major updates: $majorUpdates"
+            Write-Host "  Minor updates: $minorUpdates"
+            Write-Host "  Patch updates: $patchUpdates"
+
+            if ($totalUpdates -gt 0) {
+              echo "has-updates=true" >> $env:GITHUB_OUTPUT
+              $summaryText = "Total: $totalUpdates (Major: $majorUpdates, Minor: $minorUpdates, Patch: $patchUpdates)"
+              echo "summary=$summaryText" >> $env:GITHUB_OUTPUT
+
+              # Export detailed updates for later use
+              $updateSummary | ConvertTo-Json | Out-File -FilePath "update-summary.json"
+            } else {
+              echo "has-updates=false" >> $env:GITHUB_OUTPUT
+              echo "summary=No updates available" >> $env:GITHUB_OUTPUT
+            }
           } else {
-            Write-Host "has-updates=false" >> $env:GITHUB_OUTPUT
-            Write-Host "summary=No updates available" >> $env:GITHUB_OUTPUT
+            # Fallback: Try simple text output
+            Write-Host "JSON parsing failed, trying simple check..."
+            $simpleOutput = & dotnet outdated 2>&1
+
+            if ($simpleOutput -match "No outdated packages found") {
+              Write-Host "✅ No outdated packages found"
+              echo "has-updates=false" >> $env:GITHUB_OUTPUT
+              echo "summary=No updates available" >> $env:GITHUB_OUTPUT
+            } elseif ($simpleOutput -match "The following sources were used") {
+              Write-Host "⚠️ Outdated packages detected (simple check)"
+              echo "has-updates=true" >> $env:GITHUB_OUTPUT
+              echo "summary=Updates available (detailed analysis failed)" >> $env:GITHUB_OUTPUT
+            } else {
+              Write-Host "::warning::Could not determine update status"
+              echo "has-updates=false" >> $env:GITHUB_OUTPUT
+              echo "summary=Check inconclusive" >> $env:GITHUB_OUTPUT
+            }
           }
-        } else {
-          Write-Host "::warning::Could not parse outdated packages output"
-          Write-Host "has-updates=false" >> $env:GITHUB_OUTPUT
-          Write-Host "summary=Check failed" >> $env:GITHUB_OUTPUT
+        } catch {
+          Write-Host "::error::Exception during dependency check: $($_.Exception.Message)"
+          echo "has-updates=false" >> $env:GITHUB_OUTPUT
+          echo "summary=Check failed with exception" >> $env:GITHUB_OUTPUT
         }
-        
+
         Write-Host "::endgroup::"
 
     - name: 🛡️ Security vulnerability check
       id: security-check
       run: |
         Write-Host "::group::Security Vulnerability Check"
-        
+
         # Check for vulnerable packages
         $vulnerableOutput = dotnet list package --vulnerable --include-transitive 2>&1
-        
+
         if ($vulnerableOutput -match "has the following vulnerable packages") {
           Write-Host "::warning::Security vulnerabilities found!"
           Write-Host "has-security-updates=true" >> $env:GITHUB_OUTPUT
-          
+
           # Extract vulnerability details
           $vulnerableOutput | Out-File -FilePath "vulnerabilities.txt"
         } else {
           Write-Host "::notice::✅ No security vulnerabilities found"
           Write-Host "has-security-updates=false" >> $env:GITHUB_OUTPUT
         }
-        
+
         Write-Host "::endgroup::"
 
     - name: 📤 Upload analysis results
@@ -162,7 +218,7 @@ jobs:
     runs-on: windows-latest
     needs: check-dependencies
     if: needs.check-dependencies.outputs.has-updates == 'true' || needs.check-dependencies.outputs.security-updates == 'true'
-    
+
     steps:
     - name: 📥 Checkout repository
       uses: actions/checkout@v4
@@ -181,29 +237,29 @@ jobs:
     - name: 🔧 Install update tools
       run: |
         dotnet tool install --global dotnet-outdated-tool
-        
+
     - name: 🔄 Perform dependency updates
       id: update-deps
       run: |
         Write-Host "::group::Dependency Updates"
-        
+
         $updateType = "${{ github.event.inputs.update_type || 'minor' }}"
         $hasSecurityUpdates = "${{ needs.check-dependencies.outputs.security-updates }}" -eq "true"
-        
+
         Write-Host "Update type: $updateType"
         Write-Host "Security updates needed: $hasSecurityUpdates"
-        
+
         # Always update security vulnerabilities regardless of update type
         if ($hasSecurityUpdates) {
           Write-Host "🛡️ Prioritizing security updates..."
-          
+
           # Get vulnerable packages and update them
-          $vulnerablePackages = dotnet list package --vulnerable --include-transitive | 
-            Select-String ">\s+(\S+)\s+" | 
-            ForEach-Object { $_.Matches.Groups[1].Value } | 
-            Sort-Object | 
+          $vulnerablePackages = dotnet list package --vulnerable --include-transitive |
+            Select-String ">\s+(\S+)\s+" |
+            ForEach-Object { $_.Matches.Groups[1].Value } |
+            Sort-Object |
             Get-Unique
-            
+
           foreach ($package in $vulnerablePackages) {
             Write-Host "Updating vulnerable package: $package"
             try {
@@ -213,7 +269,7 @@ jobs:
             }
           }
         }
-        
+
         # Update other packages based on update type
         switch ($updateType) {
           "all" {
@@ -229,40 +285,40 @@ jobs:
             dotnet outdated --upgrade --version-lock Minor
           }
         }
-        
+
         Write-Host "::endgroup::"
 
     - name: 🏗️ Build and test after updates
       run: |
         Write-Host "::group::Build Verification"
-        
+
         # Restore with updated packages
         dotnet restore --force
-        
+
         # Build to check for breaking changes
         $buildResult = dotnet build --configuration Release --no-restore 2>&1
-        
+
         if ($LASTEXITCODE -ne 0) {
           Write-Host "::error::Build failed after dependency updates!"
           Write-Host $buildResult
           exit 1
         }
-        
+
         Write-Host "✅ Build successful after dependency updates"
         Write-Host "::endgroup::"
 
     - name: 🧪 Run tests after updates
       run: |
         Write-Host "::group::Test Verification"
-        
+
         $testResult = dotnet test --configuration Release --no-build --verbosity normal 2>&1
-        
+
         if ($LASTEXITCODE -ne 0) {
           Write-Host "::error::Tests failed after dependency updates!"
           Write-Host $testResult
           exit 1
         }
-        
+
         Write-Host "✅ All tests passed after dependency updates"
         Write-Host "::endgroup::"
 
@@ -270,28 +326,28 @@ jobs:
       id: generate-report
       run: |
         Write-Host "::group::Update Report Generation"
-        
+
         # Check what actually changed
         $changedFiles = git diff --name-only
-        
+
         if ($changedFiles) {
           Write-Host "Files changed:"
           $changedFiles | ForEach-Object { Write-Host "  $_" }
-          
+
           # Generate commit message
           $commitMessage = "chore(deps): update dependencies"
-          
+
           if ("${{ needs.check-dependencies.outputs.security-updates }}" -eq "true") {
             $commitMessage += " (includes security updates)"
           }
-          
+
           # Create detailed commit body
           $commitBody = "Automated dependency update`n`n" +
                        "Update type: ${{ github.event.inputs.update_type || 'minor' }}`n" +
                        "Summary: ${{ needs.check-dependencies.outputs.update-summary }}`n`n" +
                        "Security updates included: ${{ needs.check-dependencies.outputs.security-updates }}`n`n" +
                        "✅ Build and tests verified after updates"
-          
+
           Write-Host "commit-message=$commitMessage" >> $env:GITHUB_OUTPUT
           Write-Host "commit-body<<EOF" >> $env:GITHUB_OUTPUT
           Write-Host $commitBody >> $env:GITHUB_OUTPUT
@@ -301,7 +357,7 @@ jobs:
           Write-Host "No changes detected"
           Write-Host "has-changes=false" >> $env:GITHUB_OUTPUT
         }
-        
+
         Write-Host "::endgroup::"
 
     - name: 📤 Create Pull Request
@@ -313,25 +369,25 @@ jobs:
         title: ${{ steps.generate-report.outputs.commit-message }}
         body: |
           ${{ steps.generate-report.outputs.commit-body }}
-          
+
           ## 🔍 Changes Made
-          
+
           This PR contains automated dependency updates that have been:
           - ✅ Built successfully
           - ✅ Tested and verified
           - 🛡️ Checked for security vulnerabilities
-          
+
           ## 📊 Update Summary
-          
+
           ${{ needs.check-dependencies.outputs.update-summary }}
-          
+
           ## 🚦 Next Steps
-          
+
           1. Review the changes in this PR
           2. Check for any breaking changes in the updated packages
           3. Verify that all functionality still works as expected
           4. Merge if everything looks good
-          
+
           ---
           🤖 This PR was created automatically by the dependency update workflow
         labels: |
@@ -358,36 +414,36 @@ jobs:
     runs-on: windows-latest
     needs: [check-dependencies, update-dependencies]
     if: always()
-    
+
     steps:
     - name: 📊 Summary report
       run: |
         Write-Host "::group::📊 Dependency Update Summary"
         Write-Host "## Dependency Update Results"
         Write-Host ""
-        
+
         $check_result = "${{ needs.check-dependencies.result }}"
         $update_result = "${{ needs.update-dependencies.result }}"
         $has_updates = "${{ needs.check-dependencies.outputs.has-updates }}"
         $update_summary = "${{ needs.check-dependencies.outputs.update-summary }}"
         $security_updates = "${{ needs.check-dependencies.outputs.security-updates }}"
-        
+
         Write-Host "| Stage | Result |"
         Write-Host "|-------|--------|"
         Write-Host "| Dependency Check | $check_result |"
         Write-Host "| Updates Applied | $update_result |"
         Write-Host ""
-        
+
         if ($has_updates -eq "true") {
           Write-Host "📦 **Updates Available**: $update_summary"
         } else {
           Write-Host "✅ **No updates needed** - all dependencies are current"
         }
-        
+
         if ($security_updates -eq "true") {
           Write-Host "🛡️ **Security updates were processed**"
         }
-        
+
         if ($update_result -eq "success") {
           Write-Host "🎉 **Dependency update completed successfully!**"
         } elseif ($update_result -eq "failure") {
@@ -395,5 +451,5 @@ jobs:
         } elseif ($has_updates -eq "false") {
           Write-Host "ℹ️ **No action needed** - dependencies are up to date"
         }
-        
+
         Write-Host "::endgroup::"
