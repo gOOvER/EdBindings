@@ -23,12 +23,12 @@ jobs:
     name: 🤖 CodeRabbit AI Review
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
-    
+
     permissions:
       contents: read
       pull-requests: write
       issues: write
-      
+
     steps:
       - name: 🤖 CodeRabbit Review
         uses: coderabbitai/openai-pr-reviewer@latest
@@ -45,7 +45,7 @@ jobs:
           language: de
           path_filters: |
             !**/*.min.js
-            !**/*.min.css  
+            !**/*.min.css
             !**/bin/**
             !**/obj/**
             !**/*.Designer.cs
@@ -55,13 +55,13 @@ jobs:
             Du bist ein erfahrener .NET/C# Entwickler für das EdBindings Elite Dangerous Tool.
             Fokussiere dich auf:
             - 🛡️ Sicherheitsprobleme in WPF-Anwendungen
-            - ⚡ Performance-Optimierungen für .NET 8.0  
+            - ⚡ Performance-Optimierungen für .NET 8.0
             - 📋 Best Practices für C# und WPF
             - 🐛 Potentielle Bugs und Null-Reference-Exceptions
             - 🧹 Code-Qualität und Wartbarkeit
             - 📦 MSI Installer Sicherheit
             - 🔧 GitHub Actions Workflow Sicherheit
-            
+
             Gebe konstruktives Feedback auf Deutsch mit Code-Beispielen.
 
   # Security and dependency scanning
@@ -323,27 +323,27 @@ jobs:
 
     - name: 🔍 Check for documentation updates
       run: |
-        echo "::group::Documentation Analysis"
+        Write-Host "::group::Documentation Analysis"
 
         # Check if code changes require documentation updates
-        changed_files=$(git diff --name-only origin/main...HEAD)
-        code_changes=$(echo "$changed_files" | grep -E '\.(cs|xaml)$' | wc -l)
-        doc_changes=$(echo "$changed_files" | grep -E '\.(md|txt)$' | wc -l)
+        $changed_files = git diff --name-only origin/main...HEAD
+        $code_changes = ($changed_files | Select-String '\.(cs|xaml)$').Count
+        $doc_changes = ($changed_files | Select-String '\.(md|txt)$').Count
 
-        echo "Code files changed: $code_changes"
-        echo "Documentation files changed: $doc_changes"
+        Write-Host "Code files changed: $code_changes"
+        Write-Host "Documentation files changed: $doc_changes"
 
-        if [ "$code_changes" -gt 5 ] && [ "$doc_changes" -eq 0 ]; then
-          echo "::warning::Significant code changes detected without documentation updates. Consider updating README.md or adding release notes."
-        fi
+        if ($code_changes -gt 5 -and $doc_changes -eq 0) {
+          Write-Host "::warning::Significant code changes detected without documentation updates. Consider updating README.md or adding release notes."
+        }
 
         # Check README.md exists and is not empty
-        if [ ! -f "README.md" ] || [ ! -s "README.md" ]; then
-          echo "::error::README.md is missing or empty"
+        if (-not (Test-Path "README.md") -or (Get-Item "README.md").Length -eq 0) {
+          Write-Host "::error::README.md is missing or empty"
           exit 1
-        fi
+        }
 
-        echo "::endgroup::"
+        Write-Host "::endgroup::"
 
     - name: 📝 Spell check documentation
       uses: crate-ci/typos@master
@@ -362,39 +362,39 @@ jobs:
     steps:
     - name: 📊 Evaluate PR quality
       run: |
-        echo "::group::PR Validation Results"
+        Write-Host "::group::PR Validation Results"
 
-        security_result="${{ needs.security-scan.result }}"
-        quality_result="${{ needs.code-quality.result }}"
-        performance_result="${{ needs.performance-check.result }}"
-        docs_result="${{ needs.documentation-check.result }}"
+        $security_result = "${{ needs.security-scan.result }}"
+        $quality_result = "${{ needs.code-quality.result }}"
+        $performance_result = "${{ needs.performance-check.result }}"
+        $docs_result = "${{ needs.documentation-check.result }}"
 
-        echo "Security Scan: $security_result"
-        echo "Code Quality: $quality_result"
-        echo "Performance Check: $performance_result"
-        echo "Documentation Check: $docs_result"
+        Write-Host "Security Scan: $security_result"
+        Write-Host "Code Quality: $quality_result"
+        Write-Host "Performance Check: $performance_result"
+        Write-Host "Documentation Check: $docs_result"
 
-        failed_checks=0
-        if [ "$security_result" != "success" ]; then failed_checks=$((failed_checks + 1)); fi
-        if [ "$quality_result" != "success" ]; then failed_checks=$((failed_checks + 1)); fi
-        if [ "$performance_result" != "success" ]; then failed_checks=$((failed_checks + 1)); fi
-        if [ "$docs_result" != "success" ]; then failed_checks=$((failed_checks + 1)); fi
+        $failed_checks = 0
+        if ($security_result -ne "success") { $failed_checks++ }
+        if ($quality_result -ne "success") { $failed_checks++ }
+        if ($performance_result -ne "success") { $failed_checks++ }
+        if ($docs_result -ne "success") { $failed_checks++ }
 
-        if [ $failed_checks -eq 0 ]; then
-          echo "::notice::✅ All PR checks passed! Ready for review."
-        elif [ $failed_checks -eq 1 ]; then
-          echo "::warning::⚠️ 1 check failed. Please review and fix issues."
-        else
-          echo "::error::❌ $failed_checks checks failed. Please address issues before review."
-        fi
+        if ($failed_checks -eq 0) {
+          Write-Host "::notice::✅ All PR checks passed! Ready for review."
+        } elseif ($failed_checks -eq 1) {
+          Write-Host "::warning::⚠️ 1 check failed. Please review and fix issues."
+        } else {
+          Write-Host "::error::❌ $failed_checks checks failed. Please address issues before review."
+        }
 
-        echo "::endgroup::"
+        Write-Host "::endgroup::"
 
     - name: 🎯 PR readiness check
       run: |
-        if [ "${{ needs.security-scan.result }}" != "success" ] || [ "${{ needs.code-quality.result }}" != "success" ]; then
-          echo "::error::Critical checks failed. PR is not ready for merge."
+        if ("${{ needs.security-scan.result }}" -ne "success" -or "${{ needs.code-quality.result }}" -ne "success") {
+          Write-Host "::error::Critical checks failed. PR is not ready for merge."
           exit 1
-        else
-          echo "::notice::PR passes critical checks and is ready for review! 🚀"
-        fi
+        } else {
+          Write-Host "::notice::PR passes critical checks and is ready for review! 🚀"
+        }

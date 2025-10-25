@@ -362,38 +362,38 @@ jobs:
     steps:
     - name: 📊 Summary report
       run: |
-        echo "::group::📊 Dependency Update Summary"
-        echo "## Dependency Update Results"
-        echo ""
+        Write-Host "::group::📊 Dependency Update Summary"
+        Write-Host "## Dependency Update Results"
+        Write-Host ""
         
-        check_result="${{ needs.check-dependencies.result }}"
-        update_result="${{ needs.update-dependencies.result }}"
-        has_updates="${{ needs.check-dependencies.outputs.has-updates }}"
-        update_summary="${{ needs.check-dependencies.outputs.update-summary }}"
-        security_updates="${{ needs.check-dependencies.outputs.security-updates }}"
+        $check_result = "${{ needs.check-dependencies.result }}"
+        $update_result = "${{ needs.update-dependencies.result }}"
+        $has_updates = "${{ needs.check-dependencies.outputs.has-updates }}"
+        $update_summary = "${{ needs.check-dependencies.outputs.update-summary }}"
+        $security_updates = "${{ needs.check-dependencies.outputs.security-updates }}"
         
-        echo "| Stage | Result |"
-        echo "|-------|--------|"
-        echo "| Dependency Check | $check_result |"
-        echo "| Updates Applied | $update_result |"
-        echo ""
+        Write-Host "| Stage | Result |"
+        Write-Host "|-------|--------|"
+        Write-Host "| Dependency Check | $check_result |"
+        Write-Host "| Updates Applied | $update_result |"
+        Write-Host ""
         
-        if [ "$has_updates" = "true" ]; then
-          echo "📦 **Updates Available**: $update_summary"
-        else
-          echo "✅ **No updates needed** - all dependencies are current"
-        fi
+        if ($has_updates -eq "true") {
+          Write-Host "📦 **Updates Available**: $update_summary"
+        } else {
+          Write-Host "✅ **No updates needed** - all dependencies are current"
+        }
         
-        if [ "$security_updates" = "true" ]; then
-          echo "🛡️ **Security updates were processed**"
-        fi
+        if ($security_updates -eq "true") {
+          Write-Host "🛡️ **Security updates were processed**"
+        }
         
-        if [ "$update_result" = "success" ]; then
-          echo "🎉 **Dependency update completed successfully!**"
-        elif [ "$update_result" = "failure" ]; then
-          echo "❌ **Dependency update failed** - please check the logs"
-        elif [ "$has_updates" = "false" ]; then
-          echo "ℹ️ **No action needed** - dependencies are up to date"
-        fi
+        if ($update_result -eq "success") {
+          Write-Host "🎉 **Dependency update completed successfully!**"
+        } elseif ($update_result -eq "failure") {
+          Write-Host "❌ **Dependency update failed** - please check the logs"
+        } elseif ($has_updates -eq "false") {
+          Write-Host "ℹ️ **No action needed** - dependencies are up to date"
+        }
         
-        echo "::endgroup::"
+        Write-Host "::endgroup::"
